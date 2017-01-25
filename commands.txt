@@ -1,0 +1,2 @@
+build_cmake/examples/BasicDemo/AppBasicExampleGui
+build_cmake/examples/ExampleBrowser/App_ExampleBrowser

@@ -21,6 +21,23 @@ subject to the following restrictions:
 #define ARRAY_SIZE_X 5
 #define ARRAY_SIZE_Z 5
 
+static btScalar gTilt = 20.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
+
+static btScalar gRampFriction = 1; // set ramp friction to 1
+
+static btScalar gRampRestitution = 0; // set ramp restitution to 0 (no restitution)
+
+
+static btScalar gSphereFriction = 1; // set sphere friction to 1
+
+static btScalar gSphereRollingFriction = 0.1; // set sphere rolling friction to 1
+
+static btScalar gSphereRestitution = 0; // set sphere restitution to 0
+
+// handles for changes
+static btRigidBody* ramp = NULL;
+static btRigidBody* gSphere = NULL;
+
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btAlignedObjectArray.h"
 
@@ -38,7 +55,7 @@ struct BasicExample : public CommonRigidBodyBase
 	virtual void renderScene();
 	void resetCamera()
 	{
-		float dist = 4;
+		float dist = 15;
 		float pitch = 52;
 		float yaw = 35;
 		float targetPos[3]={0,0,0};
@@ -75,13 +92,56 @@ void BasicExample::initPhysics()
 		createRigidBody(mass,groundTransform,groundShape, btVector4(0,0,1,1));
 	}
 
+	{ //create a static inclined plane
+		btBoxShape* inclinedPlaneShape = createBoxShape(btVector3(btScalar(20.),btScalar(1.),btScalar(10.)));
+		m_collisionShapes.push_back(inclinedPlaneShape);
+
+		btTransform startTransform;
+		startTransform.setIdentity();
+
+		// position the inclined plane above ground
+		startTransform.setOrigin(btVector3(
+                                       btScalar(0),
+                                       btScalar(0),
+                                       btScalar(0)));
+
+		btQuaternion incline;
+		incline.setRotation(btVector3(0,0,1),gTilt);
+		startTransform.setRotation(incline);
+
+		btScalar mass(0.);
+		ramp = createRigidBody(mass,startTransform,inclinedPlaneShape);
+		ramp->setFriction(gRampFriction);
+		ramp->setRestitution(gRampRestitution);
+	}
+
+
+  { //create a sphere above the inclined plane
+    btSphereShape* sphereShape = new btSphereShape(btScalar(.5));
+
+		m_collisionShapes.push_back(sphereShape);
+
+		btTransform startTransform;
+		startTransform.setIdentity();
+
+		btScalar sphereMass(1.f);
+
+		startTransform.setOrigin(
+                             btVector3(btScalar(0), btScalar(10), btScalar(4)));
+
+		gSphere = createRigidBody(sphereMass, startTransform, sphereShape);
+		gSphere->forceActivationState(DISABLE_DEACTIVATION); // to prevent the sphere on the ramp from disabling
+		gSphere->setFriction(gSphereFriction);
+		gSphere->setRestitution(gSphereRestitution);
+		gSphere->setRollingFriction(gSphereRollingFriction);
+	}
+
 
 	{
-		//create a few dynamic rigidbodies
+		//create a few dynamic rigid bodies
 		// Re-using the same collision is better for memory usage and performance
 
 		btBoxShape* colShape = createBoxShape(btVector3(.1,.1,.1));
-		
 
 		//btCollisionShape* colShape = new btSphereShape(btScalar(1.));
 		m_collisionShapes.push_back(colShape);
@@ -108,21 +168,17 @@ void BasicExample::initPhysics()
 				{
 					startTransform.setOrigin(btVector3(
 										btScalar(0.2*i),
-										btScalar(2+.2*k),
+										btScalar(5+.2*k),
 										btScalar(0.2*j)));
 
-			
 					createRigidBody(mass,startTransform,colShape);
-					
 
 				}
 			}
 		}
 	}
 
-	
 	m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
-	
 }
 
 
