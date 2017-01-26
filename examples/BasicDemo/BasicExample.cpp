@@ -15,6 +15,7 @@ subject to the following restrictions:
 
 
 #include "BasicExample.h"
+#include "landscapeData.h"
 
 #include "btBulletDynamicsCommon.h"
 #define ARRAY_SIZE_Y 5
@@ -177,6 +178,53 @@ void BasicExample::initPhysics()
 			}
 		}
 	}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// LargeMesh
+
+int LandscapeVtxCount = Landscape01VtxCount;
+
+int LandscapeIdxCount = Landscape01IdxCount;
+
+btScalar *LandscapeVtx = Landscape01Vtx;
+
+btScalar *LandscapeNml = Landscape01Nml;
+
+btScalar* LandscapeTex = Landscape01Tex;
+
+unsigned short  *LandscapeIdx = Landscape01Idx;
+
+  {
+    btTransform trans;
+    trans.setIdentity();
+
+    for(int i=0;i<8;i++) {
+
+      btTriangleIndexVertexArray* meshInterface = new btTriangleIndexVertexArray();
+      btIndexedMesh part;
+
+      part.m_vertexBase = (const unsigned char*)LandscapeVtx;
+      part.m_vertexStride = sizeof(btScalar) * 3;
+      part.m_numVertices = LandscapeVtxCount;
+      part.m_triangleIndexBase = (const unsigned char*)LandscapeIdx;
+      part.m_triangleIndexStride = sizeof( short) * 3;
+      part.m_numTriangles = LandscapeIdxCount/3;
+      part.m_indexType = PHY_SHORT;
+
+      meshInterface->addIndexedMesh(part,PHY_SHORT);
+
+      bool	useQuantizedAabbCompression = true;
+      btBvhTriangleMeshShape* trimeshShape = new btBvhTriangleMeshShape(meshInterface,useQuantizedAabbCompression);
+      btVector3 localInertia(0,0,0);
+      trans.setOrigin(btVector3(0,-25,0));
+
+      btRigidBody* body = createRigidBody(0,trans,trimeshShape);
+      body->setFriction (btScalar(0.9));
+		
+    }
+	
+}
 
 	m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
 }
