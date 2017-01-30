@@ -61,7 +61,7 @@ struct BasicExample : public CommonRigidBodyBase
 		float dist = 4;
 		float pitch = 52;
 		float yaw = 35;
-		float targetPos[3]={0,0,0};
+		float targetPos[3]={-6,6,-6};
 		m_guiHelper->resetCamera(dist,pitch,yaw,targetPos[0],targetPos[1],targetPos[2]);
 	}
 };
@@ -103,7 +103,7 @@ void BasicExample::initPhysics()
 		// position the inclined plane above ground
 		startTransform.setOrigin(btVector3(
                                        btScalar(0),
-                                       btScalar(15),
+                                       btScalar(0),
                                        btScalar(0)));
 
 		btQuaternion incline;
