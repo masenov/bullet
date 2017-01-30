@@ -66,6 +66,111 @@ struct BasicExample : public CommonRigidBodyBase
 	}
 };
 
+
+///////////////////////////////////////////////////////////////////////////////
+// LargeMesh
+
+int LandscapeVtxCount[] = {
+	Landscape01VtxCount,
+	Landscape02VtxCount,
+	Landscape03VtxCount,
+	Landscape04VtxCount,
+	Landscape05VtxCount,
+	Landscape06VtxCount,
+	Landscape07VtxCount,
+	Landscape08VtxCount,
+};
+
+int LandscapeIdxCount[] = {
+	Landscape01IdxCount,
+	Landscape02IdxCount,
+	Landscape03IdxCount,
+	Landscape04IdxCount,
+	Landscape05IdxCount,
+	Landscape06IdxCount,
+	Landscape07IdxCount,
+	Landscape08IdxCount,
+};
+
+btScalar *LandscapeVtx[] = {
+	Landscape01Vtx,
+	Landscape02Vtx,
+	Landscape03Vtx,
+	Landscape04Vtx,
+	Landscape05Vtx,
+	Landscape06Vtx,
+	Landscape07Vtx,
+	Landscape08Vtx,
+};
+
+btScalar *LandscapeNml[] = {
+	Landscape01Nml,
+	Landscape02Nml,
+	Landscape03Nml,
+	Landscape04Nml,
+	Landscape05Nml,
+	Landscape06Nml,
+	Landscape07Nml,
+	Landscape08Nml,
+};
+
+btScalar* LandscapeTex[] = {
+	Landscape01Tex,
+	Landscape02Tex,
+	Landscape03Tex,
+	Landscape04Tex,
+	Landscape05Tex,
+	Landscape06Tex,
+	Landscape07Tex,
+	Landscape08Tex,
+};
+
+unsigned short  *LandscapeIdx[] = {
+	Landscape01Idx,
+	Landscape02Idx,
+	Landscape03Idx,
+	Landscape04Idx,
+	Landscape05Idx,
+	Landscape06Idx,
+	Landscape07Idx,
+	Landscape08Idx,
+};
+
+void BenchmarkDemo::createLargeMeshBody()
+{
+	btTransform trans;
+	trans.setIdentity();
+
+	for(int i=0;i<8;i++) {
+
+		btTriangleIndexVertexArray* meshInterface = new btTriangleIndexVertexArray();
+		btIndexedMesh part;
+
+		part.m_vertexBase = (const unsigned char*)LandscapeVtx[i];
+		part.m_vertexStride = sizeof(btScalar) * 3;
+		part.m_numVertices = LandscapeVtxCount[i];
+		part.m_triangleIndexBase = (const unsigned char*)LandscapeIdx[i];
+		part.m_triangleIndexStride = sizeof( short) * 3;
+		part.m_numTriangles = LandscapeIdxCount[i]/3;
+		part.m_indexType = PHY_SHORT;
+
+		meshInterface->addIndexedMesh(part,PHY_SHORT);
+
+		bool	useQuantizedAabbCompression = true;
+		btBvhTriangleMeshShape* trimeshShape = new btBvhTriangleMeshShape(meshInterface,useQuantizedAabbCompression);
+		btVector3 localInertia(0,0,0);
+		trans.setOrigin(btVector3(0,-25,0));
+
+		btRigidBody* body = createRigidBody(0,trans,trimeshShape);
+		body->setFriction (btScalar(0.9));
+		
+	}
+	
+}
+
+
+
+
 void BasicExample::initPhysics()
 {
 	m_guiHelper->setUpAxis(1);
