@@ -20,11 +20,35 @@ subject to the following restrictions:
 #define ARRAY_SIZE_Y 5
 #define ARRAY_SIZE_X 5
 #define ARRAY_SIZE_Z 5
+#include "landscapeData.h"
 
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btAlignedObjectArray.h"
 
 #include "../CommonInterfaces/CommonRigidBodyBase.h"
+
+#include "BulletCollision/BroadphaseCollision/btDbvtBroadphase.h"
+
+#include "BulletCollision/CollisionDispatch/btSimulationIslandManager.h"
+
+#include "LinearMath/btAlignedObjectArray.h"
+#include "LinearMath/btTransform.h"
+#include "../MultiThreadedDemo/ParallelFor.h"
+
+class btDynamicsWorld;
+
+#define NUMRAYS 500
+#define USE_PARALLEL_RAYCASTS 1
+
+class btRigidBody;
+class btBroadphaseInterface;
+class btCollisionShape;
+class btOverlappingPairCache;
+class btCollisionDispatcher;
+class btConstraintSolver;
+struct btCollisionAlgorithmCreateFunc;
+class btDefaultCollisionConfiguration;
+
 
 static btScalar gTilt = 20.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
 
@@ -53,6 +77,7 @@ struct BasicExample : public CommonRigidBodyBase
 		:CommonRigidBodyBase(helper)
 	{
 	}
+  void createLargeMeshBody();
 	virtual ~BasicExample(){}
 	virtual void initPhysics();
 	virtual void renderScene();
@@ -70,73 +95,31 @@ struct BasicExample : public CommonRigidBodyBase
 ///////////////////////////////////////////////////////////////////////////////
 // LargeMesh
 
-int LandscapeVtxCount[] = {
-	Landscape01VtxCount,
-	Landscape02VtxCount,
-	Landscape03VtxCount,
-	Landscape04VtxCount,
-	Landscape05VtxCount,
-	Landscape06VtxCount,
-	Landscape07VtxCount,
-	Landscape08VtxCount,
+int VtxCount[] = {
+	LandscapemyVtxCount,
+	};
+
+int IdxCount[] = {
+	LandscapemyIdxCount,
+	};
+
+btScalar *Vtx[] = {
+	LandscapemyVtx,
 };
 
-int LandscapeIdxCount[] = {
-	Landscape01IdxCount,
-	Landscape02IdxCount,
-	Landscape03IdxCount,
-	Landscape04IdxCount,
-	Landscape05IdxCount,
-	Landscape06IdxCount,
-	Landscape07IdxCount,
-	Landscape08IdxCount,
+btScalar *Nml[] = {
+	LandscapemyNml,
 };
 
-btScalar *LandscapeVtx[] = {
-	Landscape01Vtx,
-	Landscape02Vtx,
-	Landscape03Vtx,
-	Landscape04Vtx,
-	Landscape05Vtx,
-	Landscape06Vtx,
-	Landscape07Vtx,
-	Landscape08Vtx,
+btScalar* Tex[] = {
+	LandscapemyTex,
 };
 
-btScalar *LandscapeNml[] = {
-	Landscape01Nml,
-	Landscape02Nml,
-	Landscape03Nml,
-	Landscape04Nml,
-	Landscape05Nml,
-	Landscape06Nml,
-	Landscape07Nml,
-	Landscape08Nml,
+unsigned short  *Idx[] = {
+	LandscapemyIdx,
 };
 
-btScalar* LandscapeTex[] = {
-	Landscape01Tex,
-	Landscape02Tex,
-	Landscape03Tex,
-	Landscape04Tex,
-	Landscape05Tex,
-	Landscape06Tex,
-	Landscape07Tex,
-	Landscape08Tex,
-};
-
-unsigned short  *LandscapeIdx[] = {
-	Landscape01Idx,
-	Landscape02Idx,
-	Landscape03Idx,
-	Landscape04Idx,
-	Landscape05Idx,
-	Landscape06Idx,
-	Landscape07Idx,
-	Landscape08Idx,
-};
-
-void BenchmarkDemo::createLargeMeshBody()
+void BasicExample::createLargeMeshBody()
 {
 	btTransform trans;
 	trans.setIdentity();
@@ -146,16 +129,17 @@ void BenchmarkDemo::createLargeMeshBody()
 		btTriangleIndexVertexArray* meshInterface = new btTriangleIndexVertexArray();
 		btIndexedMesh part;
 
-		part.m_vertexBase = (const unsigned char*)LandscapeVtx[i];
+		part.m_vertexBase = (const unsigned char*)Vtx[i];
 		part.m_vertexStride = sizeof(btScalar) * 3;
-		part.m_numVertices = LandscapeVtxCount[i];
-		part.m_triangleIndexBase = (const unsigned char*)LandscapeIdx[i];
+		part.m_numVertices = VtxCount[i];
+		part.m_triangleIndexBase = (const unsigned char*)Idx[i];
 		part.m_triangleIndexStride = sizeof( short) * 3;
-		part.m_numTriangles = LandscapeIdxCount[i]/3;
+		part.m_numTriangles = IdxCount[i]/3;
 		part.m_indexType = PHY_SHORT;
 
 		meshInterface->addIndexedMesh(part,PHY_SHORT);
 
+    /*
 		bool	useQuantizedAabbCompression = true;
 		btBvhTriangleMeshShape* trimeshShape = new btBvhTriangleMeshShape(meshInterface,useQuantizedAabbCompression);
 		btVector3 localInertia(0,0,0);
@@ -163,7 +147,7 @@ void BenchmarkDemo::createLargeMeshBody()
 
 		btRigidBody* body = createRigidBody(0,trans,trimeshShape);
 		body->setFriction (btScalar(0.9));
-		
+    */
 	}
 	
 }
@@ -278,8 +262,9 @@ void BasicExample::initPhysics()
 				}
 			}
 		}
-	}
 
+    createLargeMeshBody();
+	}
 	m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
 }
 
