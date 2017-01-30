@@ -15,12 +15,16 @@ subject to the following restrictions:
 
 
 #include "BasicExample.h"
-#include "landscapeData.h"
 
 #include "btBulletDynamicsCommon.h"
 #define ARRAY_SIZE_Y 5
 #define ARRAY_SIZE_X 5
 #define ARRAY_SIZE_Z 5
+
+#include "LinearMath/btVector3.h"
+#include "LinearMath/btAlignedObjectArray.h"
+
+#include "../CommonInterfaces/CommonRigidBodyBase.h"
 
 static btScalar gTilt = 20.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
 
@@ -28,21 +32,19 @@ static btScalar gRampFriction = 1; // set ramp friction to 1
 
 static btScalar gRampRestitution = 0; // set ramp restitution to 0 (no restitution)
 
+static btScalar gBoxFriction = 1; // set box friction to 1
+
+static btScalar gBoxRestitution = 0; // set box restitution to 0
 
 static btScalar gSphereFriction = 1; // set sphere friction to 1
 
-static btScalar gSphereRollingFriction = 0.1; // set sphere rolling friction to 1
+static btScalar gSphereRollingFriction = 1; // set sphere rolling friction to 1
 
 static btScalar gSphereRestitution = 0; // set sphere restitution to 0
 
-// handles for changes
 static btRigidBody* ramp = NULL;
 static btRigidBody* gSphere = NULL;
 
-#include "LinearMath/btVector3.h"
-#include "LinearMath/btAlignedObjectArray.h"
-
-#include "../CommonInterfaces/CommonRigidBodyBase.h"
 
 
 struct BasicExample : public CommonRigidBodyBase
@@ -56,7 +58,7 @@ struct BasicExample : public CommonRigidBodyBase
 	virtual void renderScene();
 	void resetCamera()
 	{
-		float dist = 15;
+		float dist = 4;
 		float pitch = 52;
 		float yaw = 35;
 		float targetPos[3]={0,0,0};
@@ -77,11 +79,9 @@ void BasicExample::initPhysics()
 
 	///create a few basic rigid bodies
 	btBoxShape* groundShape = createBoxShape(btVector3(btScalar(50.),btScalar(50.),btScalar(50.)));
-	
 
 	//groundShape->initializePolyhedralFeatures();
 	//btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0,1,0),50);
-	
 	m_collisionShapes.push_back(groundShape);
 
 	btTransform groundTransform;
@@ -93,7 +93,7 @@ void BasicExample::initPhysics()
 		createRigidBody(mass,groundTransform,groundShape, btVector4(0,0,1,1));
 	}
 
-	{ //create a static inclined plane
+  { //create a static inclined plane
 		btBoxShape* inclinedPlaneShape = createBoxShape(btVector3(btScalar(20.),btScalar(1.),btScalar(10.)));
 		m_collisionShapes.push_back(inclinedPlaneShape);
 
@@ -103,7 +103,7 @@ void BasicExample::initPhysics()
 		// position the inclined plane above ground
 		startTransform.setOrigin(btVector3(
                                        btScalar(0),
-                                       btScalar(0),
+                                       btScalar(15),
                                        btScalar(0)));
 
 		btQuaternion incline;
@@ -115,10 +115,8 @@ void BasicExample::initPhysics()
 		ramp->setFriction(gRampFriction);
 		ramp->setRestitution(gRampRestitution);
 	}
-
-
   { //create a sphere above the inclined plane
-    btSphereShape* sphereShape = new btSphereShape(btScalar(.5));
+    btSphereShape* sphereShape = new btSphereShape(btScalar(1));
 
 		m_collisionShapes.push_back(sphereShape);
 
@@ -128,7 +126,7 @@ void BasicExample::initPhysics()
 		btScalar sphereMass(1.f);
 
 		startTransform.setOrigin(
-                             btVector3(btScalar(0), btScalar(10), btScalar(4)));
+                             btVector3(btScalar(0), btScalar(20), btScalar(4)));
 
 		gSphere = createRigidBody(sphereMass, startTransform, sphereShape);
 		gSphere->forceActivationState(DISABLE_DEACTIVATION); // to prevent the sphere on the ramp from disabling
@@ -136,10 +134,8 @@ void BasicExample::initPhysics()
 		gSphere->setRestitution(gSphereRestitution);
 		gSphere->setRollingFriction(gSphereRollingFriction);
 	}
-
-
 	{
-		//create a few dynamic rigid bodies
+		//create a few dynamic rigidbodies
 		// Re-using the same collision is better for memory usage and performance
 
 		btBoxShape* colShape = createBoxShape(btVector3(.1,.1,.1));
@@ -169,7 +165,7 @@ void BasicExample::initPhysics()
 				{
 					startTransform.setOrigin(btVector3(
 										btScalar(0.2*i),
-										btScalar(5+.2*k),
+										btScalar(2+.2*k),
 										btScalar(0.2*j)));
 
 					createRigidBody(mass,startTransform,colShape);
@@ -178,53 +174,6 @@ void BasicExample::initPhysics()
 			}
 		}
 	}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// LargeMesh
-
-int LandscapeVtxCount = Landscape01VtxCount;
-
-int LandscapeIdxCount = Landscape01IdxCount;
-
-btScalar *LandscapeVtx = Landscape01Vtx;
-
-btScalar *LandscapeNml = Landscape01Nml;
-
-btScalar* LandscapeTex = Landscape01Tex;
-
-unsigned short  *LandscapeIdx = Landscape01Idx;
-
-  {
-    btTransform trans;
-    trans.setIdentity();
-
-    for(int i=0;i<8;i++) {
-
-      btTriangleIndexVertexArray* meshInterface = new btTriangleIndexVertexArray();
-      btIndexedMesh part;
-
-      part.m_vertexBase = (const unsigned char*)LandscapeVtx;
-      part.m_vertexStride = sizeof(btScalar) * 3;
-      part.m_numVertices = LandscapeVtxCount;
-      part.m_triangleIndexBase = (const unsigned char*)LandscapeIdx;
-      part.m_triangleIndexStride = sizeof( short) * 3;
-      part.m_numTriangles = LandscapeIdxCount/3;
-      part.m_indexType = PHY_SHORT;
-
-      meshInterface->addIndexedMesh(part,PHY_SHORT);
-
-      bool	useQuantizedAabbCompression = true;
-      btBvhTriangleMeshShape* trimeshShape = new btBvhTriangleMeshShape(meshInterface,useQuantizedAabbCompression);
-      btVector3 localInertia(0,0,0);
-      trans.setOrigin(btVector3(0,-25,0));
-
-      btRigidBody* body = createRigidBody(0,trans,trimeshShape);
-      body->setFriction (btScalar(0.9));
-		
-    }
-	
-}
 
 	m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
 }
