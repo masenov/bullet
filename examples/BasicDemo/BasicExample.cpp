@@ -1,16 +1,16 @@
 /*
-Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2015 Google Inc. http://bulletphysics.org
+  Bullet Continuous Collision Detection and Physics Library
+  Copyright (c) 2015 Google Inc. http://bulletphysics.org
 
-This software is provided 'as-is', without any express or implied warranty.
-In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
-subject to the following restrictions:
+  This software is provided 'as-is', without any express or implied warranty.
+  In no event will the authors be held liable for any damages arising from the use of this software.
+  Permission is granted to anyone to use this software for any purpose, 
+  including commercial applications, and to alter it and redistribute it freely, 
+  subject to the following restrictions:
 
-1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
-2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
-3. This notice may not be removed or altered from any source distribution.
+  1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+  2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+  3. This notice may not be removed or altered from any source distribution.
 */
 
 
@@ -160,50 +160,50 @@ void BasicExample::initPhysics()
 
 
 		for (int k=0;k<ARRAY_SIZE_Y;k++)
-		{
-			for (int i=0;i<ARRAY_SIZE_X;i++)
-			{
-				for(int j = 0;j<ARRAY_SIZE_Z;j++)
-				{
-					startTransform.setOrigin(btVector3(
-										btScalar(0.2*i),
-										btScalar(2+.2*k),
-										btScalar(0.2*j)));
+      {
+        for (int i=0;i<ARRAY_SIZE_X;i++)
+          {
+            for(int j = 0;j<ARRAY_SIZE_Z;j++)
+              {
+                startTransform.setOrigin(btVector3(
+                                                   btScalar(0.2*i),
+                                                   btScalar(2+.2*k),
+                                                   btScalar(0.2*j)));
 
-					createRigidBody(mass,startTransform,colShape);
+                createRigidBody(mass,startTransform,colShape);
 
-				}
-			}
-		}
+              }
+          }
+      }
 	}
 
 	
-///////////////////////////////////////////////////////////////////////////////
-// LargeMesh
+  ///////////////////////////////////////////////////////////////////////////////
+  // LargeMesh
 
-int LandscapeVtxCount[] = {
-	LandscapemyVtxCount,
-};
+  int LandscapeVtxCount[] = {
+    LandscapemyVtxCount,
+  };
 
-int LandscapeIdxCount[] = {
-	LandscapemyIdxCount,
-};
+  int LandscapeIdxCount[] = {
+    LandscapemyIdxCount,
+  };
 
-btScalar *LandscapeVtx[] = {
-	LandscapemyVtx,
-};
+  btScalar *LandscapeVtx[] = {
+    LandscapemyVtx,
+  };
 
-btScalar *LandscapeNml[] = {
-	LandscapemyNml,
-};
+  btScalar *LandscapeNml[] = {
+    LandscapemyNml,
+  };
 
-btScalar* LandscapeTex[] = {
-	LandscapemyTex,
-};
+  btScalar* LandscapeTex[] = {
+    LandscapemyTex,
+  };
 
-unsigned short  *LandscapeIdx[] = {
-	LandscapemyIdx,
-};
+  unsigned short  *LandscapeIdx[] = {
+    LandscapemyIdx,
+  };
 
 	btTransform trans;
 	trans.setIdentity();
@@ -231,6 +231,8 @@ unsigned short  *LandscapeIdx[] = {
 		btRigidBody* body = createRigidBody(0,trans,trimeshShape);
 		body->setFriction (btScalar(0.9));
 	}
+  cout << "Output sentence"; // prints Output sentence on screen
+
 	m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
 }
 
