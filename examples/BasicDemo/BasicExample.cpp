@@ -27,29 +27,6 @@ subject to the following restrictions:
 
 #include "../CommonInterfaces/CommonRigidBodyBase.h"
 
-#include "BulletCollision/BroadphaseCollision/btDbvtBroadphase.h"
-
-#include "BulletCollision/CollisionDispatch/btSimulationIslandManager.h"
-
-#include "LinearMath/btAlignedObjectArray.h"
-#include "LinearMath/btTransform.h"
-#include "../MultiThreadedDemo/ParallelFor.h"
-
-class btDynamicsWorld;
-
-#define NUMRAYS 500
-#define USE_PARALLEL_RAYCASTS 1
-
-class btRigidBody;
-class btBroadphaseInterface;
-class btCollisionShape;
-class btOverlappingPairCache;
-class btCollisionDispatcher;
-class btConstraintSolver;
-struct btCollisionAlgorithmCreateFunc;
-class btDefaultCollisionConfiguration;
-
-
 static btScalar gTilt = 20.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
 
 static btScalar gRampFriction = 1; // set ramp friction to 1
@@ -90,70 +67,6 @@ struct BasicExample : public CommonRigidBodyBase
 		m_guiHelper->resetCamera(dist,pitch,yaw,targetPos[0],targetPos[1],targetPos[2]);
 	}
 };
-
-
-///////////////////////////////////////////////////////////////////////////////
-// LargeMesh
-
-int VtxCount[] = {
-	LandscapemyVtxCount,
-	};
-
-int IdxCount[] = {
-	LandscapemyIdxCount,
-	};
-
-btScalar *Vtx[] = {
-	LandscapemyVtx,
-};
-
-btScalar *Nml[] = {
-	LandscapemyNml,
-};
-
-btScalar* Tex[] = {
-	LandscapemyTex,
-};
-
-unsigned short  *Idx[] = {
-	LandscapemyIdx,
-};
-
-void BasicExample::createLargeMeshBody()
-{
-	btTransform trans;
-	trans.setIdentity();
-
-	for(int i=0;i<8;i++) {
-
-		btTriangleIndexVertexArray* meshInterface = new btTriangleIndexVertexArray();
-		btIndexedMesh part;
-
-		part.m_vertexBase = (const unsigned char*)Vtx[i];
-		part.m_vertexStride = sizeof(btScalar) * 3;
-		part.m_numVertices = VtxCount[i];
-		part.m_triangleIndexBase = (const unsigned char*)Idx[i];
-		part.m_triangleIndexStride = sizeof( short) * 3;
-		part.m_numTriangles = IdxCount[i]/3;
-		part.m_indexType = PHY_SHORT;
-
-		meshInterface->addIndexedMesh(part,PHY_SHORT);
-
-    /*
-		bool	useQuantizedAabbCompression = true;
-		btBvhTriangleMeshShape* trimeshShape = new btBvhTriangleMeshShape(meshInterface,useQuantizedAabbCompression);
-		btVector3 localInertia(0,0,0);
-		trans.setOrigin(btVector3(0,-25,0));
-
-		btRigidBody* body = createRigidBody(0,trans,trimeshShape);
-		body->setFriction (btScalar(0.9));
-    */
-	}
-	
-}
-
-
-
 
 void BasicExample::initPhysics()
 {
@@ -262,8 +175,61 @@ void BasicExample::initPhysics()
 				}
 			}
 		}
+	}
 
-    createLargeMeshBody();
+	
+///////////////////////////////////////////////////////////////////////////////
+// LargeMesh
+
+int LandscapeVtxCount[] = {
+	LandscapemyVtxCount,
+};
+
+int LandscapeIdxCount[] = {
+	LandscapemyIdxCount,
+};
+
+btScalar *LandscapeVtx[] = {
+	LandscapemyVtx,
+};
+
+btScalar *LandscapeNml[] = {
+	LandscapemyNml,
+};
+
+btScalar* LandscapeTex[] = {
+	LandscapemyTex,
+};
+
+unsigned short  *LandscapeIdx[] = {
+	LandscapemyIdx,
+};
+
+	btTransform trans;
+	trans.setIdentity();
+
+	for(int i=0;i<8;i++) {
+
+		btTriangleIndexVertexArray* meshInterface = new btTriangleIndexVertexArray();
+		btIndexedMesh part;
+
+		part.m_vertexBase = (const unsigned char*)LandscapeVtx[i];
+		part.m_vertexStride = sizeof(btScalar) * 3;
+		part.m_numVertices = LandscapeVtxCount[i];
+		part.m_triangleIndexBase = (const unsigned char*)LandscapeIdx[i];
+		part.m_triangleIndexStride = sizeof( short) * 3;
+		part.m_numTriangles = LandscapeIdxCount[i]/3;
+		part.m_indexType = PHY_SHORT;
+
+		meshInterface->addIndexedMesh(part,PHY_SHORT);
+
+		bool	useQuantizedAabbCompression = true;
+		btBvhTriangleMeshShape* trimeshShape = new btBvhTriangleMeshShape(meshInterface,useQuantizedAabbCompression);
+		btVector3 localInertia(0,0,0);
+		trans.setOrigin(btVector3(0,-25,0));
+
+		btRigidBody* body = createRigidBody(0,trans,trimeshShape);
+		body->setFriction (btScalar(0.9));
 	}
 	m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
 }
