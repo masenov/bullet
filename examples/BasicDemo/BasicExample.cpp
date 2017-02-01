@@ -231,7 +231,6 @@ void BasicExample::initPhysics()
 		btRigidBody* body = createRigidBody(0,trans,trimeshShape);
 		body->setFriction (btScalar(0.9));
 	}
-  cout << "Output sentence"; // prints Output sentence on screen
 
 	m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
 }
