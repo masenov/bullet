@@ -20,12 +20,14 @@
 #define ARRAY_SIZE_Y 5
 #define ARRAY_SIZE_X 5
 #define ARRAY_SIZE_Z 5
-#include "landscapeData.h"
+#include "landscapeData2.h"
 
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btAlignedObjectArray.h"
 
 #include "../CommonInterfaces/CommonRigidBodyBase.h"
+#include <iostream>
+using namespace std;
 
 static btScalar gTilt = 20.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
 
@@ -208,6 +210,22 @@ void BasicExample::initPhysics()
 	btTransform trans;
 	trans.setIdentity();
 
+  cout << 3%2 << "\n";
+  cout << sizeof(LandscapemyIdx)/sizeof(LandscapemyIdx[0])/3<< "\n"; // prints Output sentence on screen
+  int vertices_size = sizeof(LandscapemyIdx)/sizeof(LandscapemyIdx[0])/3;
+  // for (int i=0;i<vertices_size;i++){
+  //   LandscapemyIdx[i*3]=i;
+  //   LandscapemyIdx[i*3+1]=i+1;
+  //   LandscapemyIdx[i*3+2]=i+1;
+  // }
+  // vertices_size = sizeof(LandscapemyNml)/sizeof(LandscapemyNml[0]);
+  // for (int i=0;i<vertices_size;i++){
+  //   LandscapemyNml[i]=0;
+  // }
+  // vertices_size = sizeof(LandscapemyTex)/sizeof(LandscapemyTex[0]);
+  // for (int i=0;i<vertices_size;i++){
+  //   LandscapemyTex[i]=0;
+  // }
 	for(int i=0;i<8;i++) {
 
 		btTriangleIndexVertexArray* meshInterface = new btTriangleIndexVertexArray();
@@ -231,8 +249,7 @@ void BasicExample::initPhysics()
 		btRigidBody* body = createRigidBody(0,trans,trimeshShape);
 		body->setFriction (btScalar(0.9));
 	}
-  cout << "Output sentence"; // prints Output sentence on screen
-
+  
 	m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
 }
 
