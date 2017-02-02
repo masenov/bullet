@@ -156,10 +156,10 @@ void RigidBodyFromObjExample::renderScene()
 
 
 
-CommonExampleInterface*    ET_RigidBodyFromObjCreateFunc(CommonExampleOptions& options)
+CommonExampleInterface*    BasicExampleCreateFunc(CommonExampleOptions& options)
 {
 	return new RigidBodyFromObjExample(options.m_guiHelper,options.m_option);
 }
 
-B3_STANDALONE_EXAMPLE(ET_RigidBodyFromObjCreateFunc)
+B3_STANDALONE_EXAMPLE(BasicExampleCreateFunc)
 

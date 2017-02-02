@@ -22,7 +22,7 @@ enum ObjToRigidBodyOptionsEnum
         OptimizeConvexObj=2,
         ComputePolyhedralFeatures=4,
 };
-class CommonExampleInterface*    ET_RigidBodyFromObjCreateFunc(struct CommonExampleOptions& options);
+class CommonExampleInterface*    BasicExampleCreateFunc(struct CommonExampleOptions& options);
 
 
 #endif //ET_RIGIDBODYFROMOBJ_EXAMPLE_H
