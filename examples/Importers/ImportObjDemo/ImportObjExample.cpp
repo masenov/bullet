@@ -15,6 +15,7 @@
 #include "../ImportMeshUtility/b3ImportMeshUtility.h"
 #include<iostream>
 using namespace std;
+
 class ImportObjSetup : public CommonRigidBodyBase
 {
 
@@ -29,9 +30,9 @@ public:
 
 	virtual void resetCamera()
 	{
-		float dist = 18;
-		float pitch = 120;
-		float yaw = 46;
+		float dist = 13;
+		float pitch = 531;
+		float yaw = 28;
 		float targetPos[3]={-2,-2,-2};
 		m_guiHelper->resetCamera(dist,pitch,yaw,targetPos[0],targetPos[1],targetPos[2]);
 	}
@@ -70,13 +71,14 @@ int loadAndRegisterMeshFromFile2(const std::string& fileName, CommonRenderInterf
 		{
 			textureIndex = renderer->registerTexture(meshData.m_textureImage,meshData.m_textureWidth,meshData.m_textureHeight);
 		}
-    cout<<meshData.m_gfxShape->m_vertices->at(0).xyzw[0];
+		
 		shapeId = renderer->registerShape(&meshData.m_gfxShape->m_vertices->at(0).xyzw[0], 
 										  meshData.m_gfxShape->m_numvertices, 
 										  &meshData.m_gfxShape->m_indices->at(0), 
 										  meshData.m_gfxShape->m_numIndices,
 										  B3_GL_TRIANGLES,
 										  textureIndex);
+    cout<<meshData.m_gfxShape->m_vertices->at(0).xyzw[0];
 		delete meshData.m_gfxShape;
 		delete meshData.m_textureImage;
 	}
@@ -95,7 +97,7 @@ void ImportObjSetup::initPhysics()
 
 	btTransform trans;
     trans.setIdentity();
-	trans.setRotation(btQuaternion(btVector3(0,0,0),SIMD_HALF_PI));
+	trans.setRotation(btQuaternion(btVector3(0.3,0.3,1),SIMD_HALF_PI));
 	btVector3 position = trans.getOrigin();
 	btQuaternion orn = trans.getRotation();
 		
