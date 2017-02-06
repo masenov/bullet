@@ -13,16 +13,10 @@ subject to the following restrictions:
 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef ET_RIGIDBODYFROMOBJ_EXAMPLE_H
-#define ET_RIGIDBODYFROMOBJ_EXAMPLE_H
+#ifndef BASIC_EXAMPLE_H
+#define BASIC_EXAMPLE_H
 
-enum ObjToRigidBodyOptionsEnum
-{
-        ObjUseConvexHullForRendering=1,
-        OptimizeConvexObj=2,
-        ComputePolyhedralFeatures=4,
-};
 class CommonExampleInterface*    BasicExampleCreateFunc(struct CommonExampleOptions& options);
 
 
-#endif //ET_RIGIDBODYFROMOBJ_EXAMPLE_H
+#endif //BASIC_DEMO_PHYSICS_SETUP_H

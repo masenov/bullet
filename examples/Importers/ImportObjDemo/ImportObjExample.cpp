@@ -13,7 +13,8 @@
 
 #include "../CommonInterfaces/CommonRigidBodyBase.h"
 #include "../ImportMeshUtility/b3ImportMeshUtility.h"
-
+#include<iostream>
+using namespace std;
 class ImportObjSetup : public CommonRigidBodyBase
 {
 
@@ -45,7 +46,7 @@ ImportObjSetup::ImportObjSetup(struct GUIHelperInterface* helper, const char* fi
         m_fileName = fileName;
     } else
     {
-        m_fileName = "cube.obj";//"sponza_closed.obj";//sphere8.obj";
+        m_fileName = "surface.obj";//"sponza_closed.obj";//sphere8.obj";
     }
 }
 
@@ -69,7 +70,7 @@ int loadAndRegisterMeshFromFile2(const std::string& fileName, CommonRenderInterf
 		{
 			textureIndex = renderer->registerTexture(meshData.m_textureImage,meshData.m_textureWidth,meshData.m_textureHeight);
 		}
-		
+    cout<<meshData.m_gfxShape->m_vertices->at(0).xyzw[0];
 		shapeId = renderer->registerShape(&meshData.m_gfxShape->m_vertices->at(0).xyzw[0], 
 										  meshData.m_gfxShape->m_numvertices, 
 										  &meshData.m_gfxShape->m_indices->at(0), 
@@ -94,7 +95,7 @@ void ImportObjSetup::initPhysics()
 
 	btTransform trans;
     trans.setIdentity();
-	trans.setRotation(btQuaternion(btVector3(1,0,0),SIMD_HALF_PI));
+	trans.setRotation(btQuaternion(btVector3(0,0,0),SIMD_HALF_PI));
 	btVector3 position = trans.getOrigin();
 	btQuaternion orn = trans.getRotation();
 		
