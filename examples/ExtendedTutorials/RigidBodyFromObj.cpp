@@ -111,7 +111,7 @@ void RigidBodyFromObjExample::initPhysics()
 	btTransform startTransform;
 	startTransform.setIdentity();
 
-	btScalar	mass(1.f);
+	btScalar	mass(0.f);
 	bool isDynamic = (mass != 0.f);
 	btVector3 localInertia(0,0,0);
 	if (isDynamic)
