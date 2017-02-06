@@ -26,9 +26,9 @@ subject to the following restrictions:
 
 #include "../CommonInterfaces/CommonRigidBodyBase.h"
 
-static btScalar gTilt = 20.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
+static btScalar gTilt = 35.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
 
-static btScalar gRampFriction = 1; // set ramp friction to 1
+static btScalar gRampFriction = 0.474; // set ramp friction to 1
 
 static btScalar gRampRestitution = 0; // set ramp restitution to 0 (no restitution)
 
@@ -38,7 +38,7 @@ static btScalar gBoxRestitution = 0; // set box restitution to 0
 
 static btScalar gSphereFriction = 1; // set sphere friction to 1
 
-static btScalar gSphereRollingFriction = 1; // set sphere rolling friction to 1
+static btScalar gSphereRollingFriction = 0.368; // set sphere rolling friction to 1
 
 static btScalar gSphereRestitution = 0; // set sphere restitution to 0
 
@@ -126,7 +126,7 @@ void BasicExample::initPhysics()
 		btScalar sphereMass(1.f);
 
 		startTransform.setOrigin(
-                             btVector3(btScalar(0), btScalar(20), btScalar(4)));
+                             btVector3(btScalar(8), btScalar(10), btScalar(4)));
 
 		gSphere = createRigidBody(sphereMass, startTransform, sphereShape);
 		gSphere->forceActivationState(DISABLE_DEACTIVATION); // to prevent the sphere on the ramp from disabling
