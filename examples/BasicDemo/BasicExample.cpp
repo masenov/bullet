@@ -30,17 +30,17 @@ static btScalar gTilt = 35.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
 
 static btScalar gRampFriction = 0.474; // set ramp friction to 1
 
-static btScalar gRampRestitution = 0; // set ramp restitution to 0 (no restitution)
+static btScalar gRampRestitution = 1.2; // set ramp restitution to 0 (no restitution)
 
-static btScalar gBoxFriction = 1; // set box friction to 1
+static btScalar gBoxFriction = 1.3; // set box friction to 1
 
-static btScalar gBoxRestitution = 0; // set box restitution to 0
+static btScalar gBoxRestitution = 1; // set box restitution to 0
 
 static btScalar gSphereFriction = 1; // set sphere friction to 1
 
 static btScalar gSphereRollingFriction = 0.368; // set sphere rolling friction to 1
 
-static btScalar gSphereRestitution = 0; // set sphere restitution to 0
+static btScalar gSphereRestitution = 1.5; // set sphere restitution to 0
 
 static btRigidBody* ramp = NULL;
 static btRigidBody* gSphere = NULL;
@@ -56,7 +56,9 @@ struct BasicExample : public CommonRigidBodyBase
 	virtual ~BasicExample(){}
 	virtual void initPhysics();
 	virtual void renderScene();
-	void resetCamera()
+	virtual void stepSimulation(float deltaTime);
+
+  void resetCamera()
 	{
 		float dist = 4;
 		float pitch = 52;
@@ -65,6 +67,16 @@ struct BasicExample : public CommonRigidBodyBase
 		m_guiHelper->resetCamera(dist,pitch,yaw,targetPos[0],targetPos[1],targetPos[2]);
 	}
 };
+
+void BasicExample::stepSimulation(float deltaTime)
+{
+          m_dynamicsWorld->stepSimulation(4./240,0);
+          b3Printf("Velocity = %f,%f,%f\n",gSphere->getAngularVelocity()[0],
+                   gSphere->getAngularVelocity()[1],
+                   gSphere->getAngularVelocity()[2]);
+
+    //CommonRigidBodyBase::stepSimulation(deltaTime);
+}
 
 void BasicExample::initPhysics()
 {
@@ -133,6 +145,7 @@ void BasicExample::initPhysics()
 		gSphere->setFriction(gSphereFriction);
 		gSphere->setRestitution(gSphereRestitution);
 		gSphere->setRollingFriction(gSphereRollingFriction);
+    //gSphere->setContactStiffnessAndDamping(100,1);
 	}
 	{
 		//create a few dynamic rigidbodies
@@ -147,7 +160,7 @@ void BasicExample::initPhysics()
 		btTransform startTransform;
 		startTransform.setIdentity();
 
-		btScalar	mass(1.f);
+		btScalar	mass(1);
 
 		//rigidbody is dynamic if and only if mass is non zero, otherwise static
 		bool isDynamic = (mass != 0.f);
