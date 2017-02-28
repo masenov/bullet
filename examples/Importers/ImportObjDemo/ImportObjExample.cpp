@@ -25,7 +25,7 @@
 #include "../OpenGLWindow/GLInstanceGraphicsShape.h"
 
 using namespace std;
-static btScalar gTilt = 20.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
+static btScalar gTilt = 270.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
 
 static btScalar gRampFriction = 1; // set ramp friction to 1
 
@@ -171,7 +171,7 @@ void ImportObjSetup::initPhysics()
 	GLInstanceGraphicsShape* glmesh = LoadMeshFromObj(relativeFileName, "");
 	printf("[INFO] Obj loaded: Extracted %d verticed from obj file [%s]\n", glmesh->m_numvertices, fileName);
 
-	const GLInstanceVertex& v = glmesh->m_vertices->at(0);
+	const GLInstanceVertex& v = glmesh->m_vertices->at(2);
 	btConvexHullShape* shape = new btConvexHullShape((const btScalar*)(&(v.xyzw[0])), glmesh->m_numvertices, sizeof(GLInstanceVertex));
 
 	float scaling[4] = {1,1,1,1};
@@ -197,7 +197,7 @@ void ImportObjSetup::initPhysics()
 	btTransform startTransform;
 	btScalar	mass(0.f);
 	btQuaternion incline;
-  incline.setRotation(btVector3(0.3,0.3,1),gTilt);
+  incline.setRotation(btVector3(1,0,0),gTilt);
   startTransform.setRotation(incline);
   bool isDynamic = (mass != 0.f);
 	btVector3 localInertia(0,0,0);
@@ -206,10 +206,10 @@ void ImportObjSetup::initPhysics()
 
 	float color[4] = {1,1,1,1};
 	float orn[4] = {0,0,0,1};
-	float pos[4] = {0,0,0,0};
+	float pos[4] = {2,2,2,0};
 	btVector3 position(pos[0],pos[1],pos[2]);
 	startTransform.setOrigin(position);
-        btRigidBody* body = createRigidBody(mass,startTransform,shape);
+  btRigidBody* body = createRigidBody(mass,startTransform,shape);
 
 
 	
