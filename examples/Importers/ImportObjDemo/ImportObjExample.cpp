@@ -139,7 +139,7 @@ void ImportObjSetup::initPhysics()
 	}
 
   { //create a sphere above the inclined plane
-    btSphereShape* sphereShape = new btSphereShape(btScalar(0.5));
+    btSphereShape* sphereShape = new btSphereShape(btScalar(0.2));
 
 		m_collisionShapes.push_back(sphereShape);
 
@@ -149,7 +149,7 @@ void ImportObjSetup::initPhysics()
 		btScalar sphereMass(1.f);
 
 		startTransform.setOrigin(
-                             btVector3(btScalar(0), btScalar(5), btScalar(-4)));
+                             btVector3(btScalar(-3), btScalar(5), btScalar(-2)));
 
 		gSphere = createRigidBody(sphereMass, startTransform, sphereShape);
 		gSphere->forceActivationState(DISABLE_DEACTIVATION); // to prevent the sphere on the ramp from disabling
@@ -197,16 +197,20 @@ void ImportObjSetup::initPhysics()
 	btTransform startTransform;
 	btScalar	mass(0.f);
 	btQuaternion incline;
-  incline.setRotation(btVector3(1,0,0),gTilt);
+  static btScalar yRot = 45.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
+  static btScalar gTilt = 90.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
+  //incline.setRotation(btVector3(1,0,0),gTilt);
+  incline.setEulerZYX(gTilt,yRot,0);
+  //incline.setRotation(btVector3(0,1,0),yRot);
   startTransform.setRotation(incline);
   bool isDynamic = (mass != 0.f);
 	btVector3 localInertia(0,0,0);
 	if (isDynamic)
 		shape->calculateLocalInertia(mass,localInertia);
-
+  
 	float color[4] = {1,1,1,1};
 	float orn[4] = {0,0,0,1};
-	float pos[4] = {2,2,2,0};
+	float pos[4] = {0,0,0,0};
 	btVector3 position(pos[0],pos[1],pos[2]);
 	startTransform.setOrigin(position);
   btRigidBody* body = createRigidBody(mass,startTransform,shape);
