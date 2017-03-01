@@ -197,7 +197,7 @@ void ImportObjSetup::initPhysics()
 	btTransform startTransform;
 	btScalar	mass(0.f);
 	btQuaternion incline;
-  static btScalar yRot = 45.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
+  static btScalar yRot = 90.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
   static btScalar gTilt = 90.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
   //incline.setRotation(btVector3(1,0,0),gTilt);
   incline.setEulerZYX(gTilt,yRot,0);
@@ -210,7 +210,7 @@ void ImportObjSetup::initPhysics()
   
 	float color[4] = {1,1,1,1};
 	float orn[4] = {0,0,0,1};
-	float pos[4] = {0,0,0,0};
+	float pos[4] = {1,1,1,0};
 	btVector3 position(pos[0],pos[1],pos[2]);
 	startTransform.setOrigin(position);
   btRigidBody* body = createRigidBody(mass,startTransform,shape);
