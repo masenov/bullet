@@ -25,8 +25,10 @@ subject to the following restrictions:
 #include "LinearMath/btAlignedObjectArray.h"
 
 #include "../CommonInterfaces/CommonRigidBodyBase.h"
+#include <fstream>
+//using namespace std;
 
-static btScalar gTilt = 35.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
+static btScalar gTilt = 15.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
 
 static btScalar gRampFriction = 0.474; // set ramp friction to 1
 
@@ -70,16 +72,29 @@ struct BasicExample : public CommonRigidBodyBase
 
 void BasicExample::stepSimulation(float deltaTime)
 {
-          m_dynamicsWorld->stepSimulation(4./240,0);
-          b3Printf("Velocity = %f,%f,%f\n",gSphere->getAngularVelocity()[0],
-                   gSphere->getAngularVelocity()[1],
-                   gSphere->getAngularVelocity()[2]);
+  std::ofstream myfile;
+  myfile.open ("example.txt",std::ios::app);
+  //myfile << "Writing this to a file.\n";
+  m_dynamicsWorld->stepSimulation(4./240,0);
+  std::string s = std::to_string(gSphere->getCenterOfMassPosition()[0]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[1]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[2]) + "\n";
+  myfile << s;
+  myfile.close();
+    //       b3Printf("Velocity = %f,%f,%f,%f,%f,%f\n",gSphere->getAngularVelocity()[0],
+    //                gSphere->getAngularVelocity()[1],
+    //                gSphere->getAngularVelocity()[2],
+    //                gSphere->getCenterOfMassPosition()[0],
+    //                gSphere->getCenterOfMassPosition()[1],
+    //                gSphere->getCenterOfMassPosition()[2]);
 
-    //CommonRigidBodyBase::stepSimulation(deltaTime);
+    // //CommonRigidBodyBase::stepSimulation(deltaTime);
 }
 
 void BasicExample::initPhysics()
 {
+  std::ofstream myfile;
+  myfile.open("example.txt");
+  myfile.close();
+
 	m_guiHelper->setUpAxis(1);
 
 	createEmptyDynamicsWorld();
@@ -187,8 +202,7 @@ void BasicExample::initPhysics()
 			}
 		}
 	}
-
-	m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
+  	m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
 }
 
 
