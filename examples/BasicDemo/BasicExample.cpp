@@ -1,51 +1,36 @@
-/*
-Bullet Continuous Collision Detection and Physics Library
-Copyright (c) 2015 Google Inc. http://bulletphysics.org
-
-This software is provided 'as-is', without any express or implied warranty.
-In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
-subject to the following restrictions:
-
-1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
-2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
-3. This notice may not be removed or altered from any source distribution.
-*/
-
-
 #include "BasicExample.h"
-
 #include "btBulletDynamicsCommon.h"
 #define ARRAY_SIZE_Y 5
 #define ARRAY_SIZE_X 5
 #define ARRAY_SIZE_Z 5
-
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btAlignedObjectArray.h"
-
 #include "../CommonInterfaces/CommonRigidBodyBase.h"
 #include <fstream>
 //using namespace std;
-
-static btScalar gTilt = 15.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
-
-static btScalar gRampFriction = 0.474; // set ramp friction to 1
-
-static btScalar gRampRestitution = 1.2; // set ramp restitution to 0 (no restitution)
-
-static btScalar gBoxFriction = 1.3; // set box friction to 1
-
-static btScalar gBoxRestitution = 1; // set box restitution to 0
-
-static btScalar gSphereFriction = 1; // set sphere friction to 1
-
-static btScalar gSphereRollingFriction = 0.368; // set sphere rolling friction to 1
-
-static btScalar gSphereRestitution = 1.5; // set sphere restitution to 0
-
 static btRigidBody* ramp = NULL;
 static btRigidBody* gSphere = NULL;
+static btScalar gTilt = 40.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
+static btScalar gRampFriction = 0.474; // set ramp friction to 1
+static btScalar gRampRestitution = 1.2; // set ramp restitution to 0 (no restitution)
+static btScalar gBoxFriction = 1.3; // set box friction to 1
+static btScalar gBoxRestitution = 1; // set box restitution to 0
+static btScalar gSphereFriction = 1; // set sphere friction to 1
+static btScalar gSphereRollingFriction =0.368; // set sphere rolling friction to 1
+static btScalar gSphereRestitution = 1.5; // set sphere restitution to 0
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
