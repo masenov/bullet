@@ -12,12 +12,13 @@ static btRigidBody* ramp = NULL;
 static btRigidBody* gSphere = NULL;
 static btScalar gTilt = 20.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
 static btScalar gRampFriction = 0.474; // set ramp friction to 1
-static btScalar gRampRestitution = 1.2; // set ramp restitution to 0 (no restitution)
+static btScalar gRampRestitution = 0.9; // set ramp restitution to 0 (no restitution)
 static btScalar gBoxFriction = 1.3; // set box friction to 1
 static btScalar gBoxRestitution = 1; // set box restitution to 0
 static btScalar gSphereFriction = 1; // set sphere friction to 1
 static btScalar gSphereRollingFriction =0.368; // set sphere rolling friction to 1
-static btScalar gSphereRestitution = 1.5; // set sphere restitution to 0
+static btScalar gSphereRestitution = 0.9; // set sphere restitution to 0
+static std::string filename = "experiments/data9.txt";
 
 struct BasicExample : public CommonRigidBodyBase
 {
@@ -43,7 +44,7 @@ struct BasicExample : public CommonRigidBodyBase
 void BasicExample::stepSimulation(float deltaTime)
 {
   std::ofstream myfile;
-  myfile.open ("example.txt",std::ios::app);
+  myfile.open (filename,std::ios::app);
   //myfile << "Writing this to a file.\n";
   m_dynamicsWorld->stepSimulation(4./240,0);
   std::string s = std::to_string(gSphere->getCenterOfMassPosition()[0]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[1]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[2]) + "\n";
@@ -112,6 +113,29 @@ void BasicExample::initPhysics()
 		ramp->setFriction(gRampFriction);
 		ramp->setRestitution(gRampRestitution);
 	}
+  { //create a static inclined plane
+    static btRigidBody* ramp2 = NULL;
+		btBoxShape* inclinedPlaneShape2 = createBoxShape(btVector3(btScalar(180.),btScalar(1.),btScalar(180.)));
+		m_collisionShapes.push_back(inclinedPlaneShape2);
+
+		btTransform startTransform2;
+		startTransform2.setIdentity();
+
+		// position the inclined plane above ground
+		startTransform2.setOrigin(btVector3(
+                                       btScalar(40),
+                                       btScalar(0),
+                                       btScalar(0)));
+
+		btQuaternion incline2;
+		incline2.setRotation(btVector3(0,0,1),0);
+		startTransform2.setRotation(incline2);
+
+		btScalar mass2(0.);
+		ramp2 = createRigidBody(mass2,startTransform2,inclinedPlaneShape2);
+		ramp2->setFriction(gRampFriction);
+		ramp2->setRestitution(gRampRestitution);
+	}
   { //create a sphere above the inclined plane
     btSphereShape* sphereShape = new btSphereShape(btScalar(1));
 
@@ -132,47 +156,7 @@ void BasicExample::initPhysics()
 		gSphere->setRollingFriction(gSphereRollingFriction);
     //gSphere->setContactStiffnessAndDamping(100,1);
 	}
-	{
-		//create a few dynamic rigidbodies
-		// Re-using the same collision is better for memory usage and performance
-
-		btBoxShape* colShape = createBoxShape(btVector3(.1,.1,.1));
-
-		//btCollisionShape* colShape = new btSphereShape(btScalar(1.));
-		m_collisionShapes.push_back(colShape);
-
-		/// Create Dynamic Objects
-		btTransform startTransform;
-		startTransform.setIdentity();
-
-		btScalar	mass(1);
-
-		//rigidbody is dynamic if and only if mass is non zero, otherwise static
-		bool isDynamic = (mass != 0.f);
-
-		btVector3 localInertia(0,0,0);
-		if (isDynamic)
-			colShape->calculateLocalInertia(mass,localInertia);
-
-
-		for (int k=0;k<ARRAY_SIZE_Y;k++)
-		{
-			for (int i=0;i<ARRAY_SIZE_X;i++)
-			{
-				for(int j = 0;j<ARRAY_SIZE_Z;j++)
-				{
-					startTransform.setOrigin(btVector3(
-										btScalar(0.2*i),
-										btScalar(2+.2*k),
-										btScalar(0.2*j)));
-
-					createRigidBody(mass,startTransform,colShape);
-
-				}
-			}
-		}
-	}
-  	m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
+	  	m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);
 }
 
 

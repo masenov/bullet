@@ -8,7 +8,7 @@ import numpy as np
 x = []
 y = []
 z = []
-with open('build_cmake/example.txt', 'rb') as csvfile:
+with open('build_cmake/experiments/data9.txt', 'rt') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
     for row in spamreader:
         x.append(float(row[0]))
