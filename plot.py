@@ -15,6 +15,7 @@ with open('build_cmake/experiments/data7.txt', 'rt') as csvfile:
         y.append(float(row[1]))
         z.append(float(row[2]))
 
+import pdb; pdb.set_trace()
 colors = cm.rainbow(np.linspace(0, 1, len(x)))
 fig = plt.figure()
 ax = plt.axes(projection='3d')

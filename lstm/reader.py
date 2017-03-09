@@ -23,7 +23,7 @@ import collections
 import os
 
 import tensorflow as tf
-
+import csv
 
 def _read_words(filename):
   with tf.gfile.GFile(filename, "r") as f:
@@ -46,6 +46,19 @@ def _file_to_word_ids(filename, word_to_id):
   data = _read_words(filename)
   return [word_to_id[word] for word in data if word in word_to_id]
 
+def _load_data(filename):
+  x = []
+  y = []
+  z = []
+  with open(filename, 'rt') as csvfile:
+      spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+      for row in spamreader:
+          x.append(float(row[0]))
+          y.append(float(row[1]))
+          z.append(float(row[2]))
+  return [x,y,z]
+
+
 
 def ptb_raw_data(data_path=None):
   """Load PTB raw data from data directory "data_path".
@@ -66,16 +79,17 @@ def ptb_raw_data(data_path=None):
     where each of the data objects can be passed to PTBIterator.
   """
 
-  train_path = os.path.join(data_path, "ptb.train.txt")
-  valid_path = os.path.join(data_path, "ptb.valid.txt")
-  test_path = os.path.join(data_path, "ptb.test.txt")
+  train_path = os.path.join(data_path, "data7.txt")
+  valid_path = os.path.join(data_path, "data8.txt")
+  test_path = os.path.join(data_path, "data9.txt")
 
-  word_to_id = _build_vocab(train_path)
-  train_data = _file_to_word_ids(train_path, word_to_id)
-  valid_data = _file_to_word_ids(valid_path, word_to_id)
-  test_data = _file_to_word_ids(test_path, word_to_id)
-  vocabulary = len(word_to_id)
-  return train_data, valid_data, test_data, vocabulary
+  import pdb; pdb.set_trace()
+  #word_to_id = _build_vocab(train_path)
+  train_data = _load_data(train_path)
+  valid_data =  _load_data(valid_path)
+  test_data =  _load_data(test_path)
+  #vocabulary = len(word_to_id)
+  return train_data, valid_data, test_data
 
 
 def ptb_producer(raw_data, batch_size, num_steps, name=None):
@@ -97,9 +111,10 @@ def ptb_producer(raw_data, batch_size, num_steps, name=None):
   Raises:
     tf.errors.InvalidArgumentError: if batch_size or num_steps are too high.
   """
-  with tf.name_scope(name, "PTBProducer", [raw_data, batch_size, num_steps]):
-    raw_data = tf.convert_to_tensor(raw_data, name="raw_data", dtype=tf.int32)
 
+  with tf.name_scope(name, "PTBProducer", [raw_data, batch_size, num_steps]):
+    raw_data = tf.convert_to_tensor(raw_data, name="raw_data", dtype=tf.float32)
+    import pdb; pdb.set_trace()
     data_len = tf.size(raw_data)
     batch_len = data_len // batch_size
     data = tf.reshape(raw_data[0 : batch_size * batch_len],
