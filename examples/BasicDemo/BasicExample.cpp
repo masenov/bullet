@@ -10,15 +10,14 @@
 //using namespace std;
 static btRigidBody* ramp = NULL;
 static btRigidBody* gSphere = NULL;
-static btScalar gTilt = 15.749999999999998f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
-static btScalar gRampFriction = 0.0; // set ramp friction to 1
-static btScalar gRampRestitution = 0.0; // set ramp restitution to 0 (no restitution)
-static btScalar gBoxFriction = 1.3; // set box friction to 1
-static btScalar gBoxRestitution = 1; // set box restitution to 0
-static btScalar gSphereFriction = 0.0; // set sphere friction to 1
+static btScalar gTilt = 36.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
+static btScalar gRampFriction = 0.8; // set ramp friction to 1
+static btScalar gRampRestitution = 0.4; // set ramp restitution to 0 (no restitution)
+static btScalar gSphereFriction = 0.8; // set sphere friction to 1
 static btScalar gSphereRollingFriction =0.368; // set sphere rolling friction to 1
-static btScalar gSphereRestitution = 0.0; // set sphere restitution to 0
-static std::string filename = "experiments/data_rest0.0fric_0.0tilt15.749999999999998.txt";
+static btScalar gSphereRestitution = 0.4; // set sphere restitution to 0
+static btScalar sphereMass = 0.0f;
+static std::string filename = "experiments/data_rest0.4fric_0.8tilt36.0mass0.0.txt";
 
 struct BasicExample : public CommonRigidBodyBase
 {
