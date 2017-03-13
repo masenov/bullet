@@ -8,13 +8,10 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import pylab
 
-def getAllFiles(directory):
+def getAllFiles():
+    directory = 'build_cmake/experiments'
     files = os.listdir(directory)
     return files
-
-def getFile(files, fileNumber):
-    file = files[fileNumber]
-    return file
 
 def varsFromFile(files, fileNumber):
     file = files[fileNumber]
@@ -46,9 +43,37 @@ def loadData(files, fileNumber):
 
 def Data(start,end):
     train = np.zeros((end-start,1000,10))
-    files = getAllFiles('build_cmake/experiments')
+    files = getAllFiles()
     vars = varsFromFile(files,1)
     for i in range(end-start):
         train[i,:,:] = loadData(files,start+i)
     return train
 
+def plot(fileNumber, files):
+    file = files[fileNumber]
+    x = []
+    y = []
+    z = []
+    with open('build_cmake/experiments/' + file, 'rt') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        for row in spamreader:
+            x.append(float(row[0]))
+            y.append(float(row[1]))
+            z.append(float(row[2]))
+
+    colors = cm.rainbow(np.linspace(0, 1, len(x)))
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+
+
+
+    ax.scatter(x, y, z, c=colors)
+    pylab.show()
+
+    fig2 = plt.figure()
+    ax = plt.axes()
+    ax.scatter(x,y,c=colors)
+    pylab.show()
+
+files = getAllFiles()
+plot(110, files)
