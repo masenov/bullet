@@ -10,7 +10,7 @@ import pylab
 x = []
 y = []
 z = []
-with open('build_cmake/experiments/data_rest0.0fric_0.0tilt18.0mass0.0.txt', 'rt') as csvfile:
+with open('build_cmake/experiments/data_rest0.0fric_0.0tilt4.5mass0.8.txt', 'rt') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
     for row in spamreader:
         x.append(float(row[0]))

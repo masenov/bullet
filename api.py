@@ -12,13 +12,12 @@ def getAllFiles(directory):
     files = os.listdir(directory)
     return files
 
-def getFile(directory, fileNumber):
-    files = getAllFiles('build_cmake/experiments')
+def getFile(files, fileNumber):
     file = files[fileNumber]
     return file
 
-def varsFromFile(fileNumber):
-    file = getFile('build_cmake/experiments',fileNumber)
+def varsFromFile(files, fileNumber):
+    file = files[fileNumber]
     rest_pos = 9
     fric_pos = file.find('fric')
     tilt_pos = file.find('tilt')
@@ -30,6 +29,26 @@ def varsFromFile(fileNumber):
     mass = float(file[mass_pos+4:end_pos])
     return (rest,fric,tilt,mass)
 
+def loadData(files, fileNumber):
+    directory = 'build_cmake/experiments'
+    file = files[fileNumber]
+    data = np.zeros((1000,10))
+    count = 0
+    with open(directory + '/' + file, 'rt') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        for row in spamreader:
+            if (count==1000):
+                break
+            for i in range(10):
+                data[count][i] = float(row[i])
+            count+=1
+    return data
 
-vars = varsFromFile(1)
-print (vars[0])
+def Data(start,end):
+    train = np.zeros((end-start,1000,10))
+    files = getAllFiles('build_cmake/experiments')
+    vars = varsFromFile(files,1)
+    for i in range(end-start):
+        train[i,:,:] = loadData(files,start+i)
+    return train
+

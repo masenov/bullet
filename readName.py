@@ -1,6 +1,7 @@
 import os
 files = os.listdir('build_cmake/experiments')
 print (files)
+print (len(files))
 file = files[2]
 rest_pos = 9
 fric_pos = file.find('fric')
