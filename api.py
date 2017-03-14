@@ -46,20 +46,25 @@ def Data(start,end):
     files = getAllFiles()
     vars = varsFromFile(files,1)
     for i in range(end-start):
+        print (i)
         train[i,:,:] = loadData(files,start+i)
     return train
 
-def plot(fileNumber, files):
+def plot(fileNumber, files, every=1):
     file = files[fileNumber]
     x = []
     y = []
     z = []
+    count = 0
     with open('build_cmake/experiments/' + file, 'rt') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in spamreader:
-            x.append(float(row[0]))
-            y.append(float(row[1]))
-            z.append(float(row[2]))
+            count += 1
+            if count==every:
+                x.append(float(row[0]))
+                y.append(float(row[1]))
+                z.append(float(row[2]))
+                count = 0
 
     colors = cm.rainbow(np.linspace(0, 1, len(x)))
     fig = plt.figure()
@@ -75,5 +80,5 @@ def plot(fileNumber, files):
     ax.scatter(x,y,c=colors)
     pylab.show()
 
-files = getAllFiles()
-plot(110, files)
+#files = getAllFiles()
+#plot(110, files, every=5)
