@@ -1,5 +1,9 @@
 import tensorflow as tf
 import csv
+import numpy as np
+from tempfile import TemporaryFile
+
+
 with open('test.txt', 'w') as fout:
                     fout.writelines("")
 num_lines = sum(1 for line in open('data.txt'))
@@ -28,3 +32,11 @@ print('Loss(x,y) = %.3f' % session.run(loss, {x: 3.0, y: 9.0}))
 print('pred_y(x) = %.3f' % session.run(y_pred, {x: 3.0}))
 # OK, print 1.000 bias evaluates to 1.0
 print('bias      = %.3f' % session.run(bias))
+
+
+outfile = TemporaryFile()
+x = np.arange(10)
+#np.save('data.npy', x)
+
+y = np.load('data.npy')
+print (y)

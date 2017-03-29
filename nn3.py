@@ -33,8 +33,6 @@ sess = tf.InteractiveSession()
 data = seqData()
 train_data = data[0:9000,:]
 test_data = data[9000:,:]
-#train_data = data[0:900,:]
-#test_data = data[900:1000,:]
 
 
 trX = train_data[:,:34]
@@ -102,61 +100,8 @@ with tf.Session() as sess:
                                           p_keep_input: 1.0, p_keep_hidden: 1.0})
         writer.add_summary(summary, i)  # Write summary
         print ('%.12f, %.12f' % (train_acc, test_acc))                   # Report the accuracy
-
-# # Weights and biases of our model
-# W1 = weight_variable([7,10])
-# b1 = bias_variable([10])
-
-# # Build a regression model
-# h1 = tf.nn.relu(tf.matmul(x,W1) + b1)
-
-# W2 = weight_variable([10,3])
-# b2 = bias_variable([3])
-
-# y = tf.nn.relu(tf.matmul(h1,W2) + b2)
-
-# # Build an error function
-# cross_entropy = tf.reduce_mean(tf.square(y - y_))
-
-# # Initialize the variables
-# sess.run(tf.global_variables_initializer())
-
-# # Train the model with steepest gradient descent
-# train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
-
-# # Evaluate the model
-# correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(y_,1))
-# accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-# u = W1.eval()
-# print (u)
-# u2 = b1.eval()
-# print (u2)
-# u3 = W2.eval()
-# print (u3)
-# u4 = b2.eval()
-# print (u4)
-
-# for i in range(20):
-#     u = W1.eval()
-#     print (u)
-#     u2 = b1.eval()
-#     print (u2)
-#     u3 = W2.eval()
-#     print (u3)
-#     u4 = b2.eval()
-#     print (u4)
-#     train_accuracy = accuracy.eval(feed_dict={
-#             x:x_test, y_: y_test})
-#     print("step %d, training accuracy %g"%(i, train_accuracy))
-#     train_step.run(feed_dict={x: x_data, y_: y_data})
+    np.save('w_h',w_h.eval())
+    np.save('w_h2',w_h2.eval())
+    np.save('w_o',w_o.eval())
 
 
-# print(accuracy.eval(feed_dict={x: x_test, y_: y_test}))
-# u = W1.eval()
-# print (u)
-# u2 = b1.eval()
-# print (u2)
-# u3 = W2.eval()
-# print (u3)
-# u4 = b2.eval()
-# print (u4)
