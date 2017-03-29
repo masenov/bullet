@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from api import *
+from time import gmtime, strftime
 
 def weight_variable(shape):
   initial = tf.truncated_normal(shape, stddev=0.1)
@@ -10,64 +11,84 @@ def bias_variable(shape):
   initial = tf.constant(0.1, shape=shape)
   return tf.Variable(initial)
 
-def conv2d(x, W):
-  return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
+def init_weights(shape, name):
+    return tf.Variable(tf.random_normal(shape, stddev=0.01), name=name)
 
-def max_pool_2x2(x):
-  return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
-                        strides=[1, 2, 2, 1], padding='SAME')
+# This network is the same as the previous one except with an extra hidden layer + dropout
+def model(X, w_h, w_h2, w_o, p_keep_input, p_keep_hidden):
+    # Add layer name scopes for better graph visualization
+    with tf.name_scope("layer1"):
+        X = tf.nn.dropout(X, p_keep_input)
+        h = tf.nn.sigmoid(tf.matmul(X, w_h))
+    with tf.name_scope("layer2"):
+        h = tf.nn.dropout(h, p_keep_hidden)
+        h2 = tf.nn.sigmoid(tf.matmul(h, w_h2))
+    with tf.name_scope("layer3"):
+        h2 = tf.nn.dropout(h2, p_keep_hidden)
+        return tf.matmul(h2, w_o)
 
-from tensorflow.examples.tutorials.mnist import input_data
-mnist = input_data.read_data_sets('MNIST_data', one_hot=True)
-print (mnist.train.next_batch)
-# Connection to C++ backend
-import tensorflow as tf
+
 sess = tf.InteractiveSession()
+data = seqData()
+train_data = data[0:9000,:]
+#train_data = train_data.reshape(train_data.shape[0]*train_data.shape[1],train_data.shape[2])
+test_data = data[9000:,:]
+#test_data = test_data.reshape(test_data.shape[0]*test_data.shape[1],test_data.shape[2])
 
-x = tf.placeholder(tf.float32, shape=[None, 784])
-y_ = tf.placeholder(tf.float32, shape=[None, 10])
+trX = train_data[:,0:34]
+trY = train_data[:,34:]
+teX = test_data[:,0:34]
+teY = test_data[:,34:]
 
-W_conv1 = weight_variable([5, 5, 1, 32])
-b_conv1 = bias_variable([32])
+print ("Loaded data")
 
-x_image = tf.reshape(x, [-1,28,28,1])
+X = tf.placeholder(tf.float32, shape=[None, 34])
+Y = tf.placeholder(tf.float32, shape=[None, 3])
 
-h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
-h_pool1 = max_pool_2x2(h_conv1)
+# Weights and biases of our model
+W1 = weight_variable([34,100])
+b1 = bias_variable([100])
 
-W_conv2 = weight_variable([5, 5, 32, 64])
-b_conv2 = bias_variable([64])
+# Build a regression model
+h1 = tf.nn.sigmoid(tf.matmul(X,W1) + b1)
 
-h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-h_pool2 = max_pool_2x2(h_conv2)
+W2 = weight_variable([100,3])
+b2 = bias_variable([3])
 
-W_fc1 = weight_variable([7 * 7 * 64, 1024])
-b_fc1 = bias_variable([1024])
+y = tf.nn.sigmoid(tf.matmul(h1,W2) + b2)
 
-h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
-h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+#Step 4 - Add histogram summaries for weights
+tf.summary.histogram("W1", W1)
+tf.summary.histogram("b1", b1)
+tf.summary.histogram("h1", h1)
+tf.summary.histogram("W2", W2)
+tf.summary.histogram("b2", b2)
+tf.summary.histogram("y", y)
 
-keep_prob = tf.placeholder(tf.float32)
-h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
+# Build an error function
+cross_entropy = tf.reduce_mean(tf.square(Y - y))
+tf.summary.scalar("cost", cross_entropy)
 
-W_fc2 = weight_variable([1024, 10])
-b_fc2 = bias_variable([10])
-
-y_conv = tf.matmul(h_fc1_drop, W_fc2) + b_fc2
-
-cross_entropy = tf.reduce_mean(
-    tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y_conv))
-train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
-correct_prediction = tf.equal(tf.argmax(y_conv,1), tf.argmax(y_,1))
-accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+# Initialize the variables
 sess.run(tf.global_variables_initializer())
-for i in range(20000):
-  batch = mnist.train.next_batch(50)
-  if i%100 == 0:
-    train_accuracy = accuracy.eval(feed_dict={
-        x:batch[0], y_: batch[1], keep_prob: 1.0})
-    print("step %d, training accuracy %g"%(i, train_accuracy))
-  train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
-print("test accuracy %g"%accuracy.eval(feed_dict={
-    x: mnist.test.images, y_: mnist.test.labels, keep_prob: 1.0}))
+# Train the model with steepest gradient descent
+train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
+
+# Evaluate the model
+correct_prediction = tf.equal(y, Y)
+accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+# Step 10 create a log writer. run 'tensorboard --logdir=./logs/nn_logs'
+writer = tf.summary.FileWriter("./logs/nn_logs/" + strftime("%Y-%m-%d %H:%M:%S", gmtime()), sess.graph) # for 0.8
+merged = tf.summary.merge_all()
+
+
+for i in range(20):
+    train_accuracy = accuracy.eval(feed_dict={
+            X:trX, Y: trY})
+    print("step %d, training accuracy %g"%(i, train_accuracy))
+    train_step.run(feed_dict={X: trX, Y: trY})
+
+
+
+print(accuracy.eval(feed_dict={X: teX, Y: teY}))

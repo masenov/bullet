@@ -1,8 +1,30 @@
-import numpy as np
+import tensorflow as tf
+import csv
+with open('test.txt', 'w') as fout:
+                    fout.writelines("")
+num_lines = sum(1 for line in open('data.txt'))
+print (num_lines)
+with open('data.txt', 'rt') as csvfile:
+    spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+    for row in spamreader:
+        print (len(row))
+        break
 
 
-W = np.array([[ 9303.62695312,-165.97647095, -365.43060303], [ -188.30963135, 193.65689087, 119.92025757], [ -533.37042236,   130.69996643,   137.08433533],  [  -71.49817657,    11.21638584,    11.38532448],     [  -60.61032867,    14.7125597,     15.41744995],    [  -20.43953896,    15.06856728,    15.53546906],     [  -59.42618561,    15.28088093,    15.29388237]])
+session = tf.InteractiveSession()
+x = tf.placeholder(tf.float32)
+y = tf.placeholder(tf.float32)
+bias = tf.Variable(1.0)
+y_pred = x ** 2 + bias     # x -> x^2 + bias
+loss = (y - y_pred)**2     # l2 loss?
 
-b = np.array([-133.93334961,   33.24583817,   34.00350952])
+session.run(tf.global_variables_initializer())
 
-start = np.array((8.000000, 15.000000, 4.000000, 0.000000, 0.100000, 0.000000, 0.000000))
+# Error: to compute loss, y is required as a dependency
+# print('Loss(x,y) = %.3f' % session.run(loss, {x: 3.0}))
+# OK, print 1.000 = (3**2 + 1 - 9)**2
+print('Loss(x,y) = %.3f' % session.run(loss, {x: 3.0, y: 9.0}))
+# OK, print 10.000; for evaluating y_pred only, input to y is not required
+print('pred_y(x) = %.3f' % session.run(y_pred, {x: 3.0}))
+# OK, print 1.000 bias evaluates to 1.0
+print('bias      = %.3f' % session.run(bias))

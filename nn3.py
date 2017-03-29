@@ -12,7 +12,7 @@ from time import gmtime, strftime
 #   return tf.Variable(initial)
 
 def init_weights(shape, name):
-    return tf.Variable(tf.random_normal(shape, stddev=0.01), name=name)
+    return tf.Variable(tf.random_normal(shape, stddev=0.1), name=name)
 
 # This network is the same as the previous one except with an extra hidden layer + dropout
 def model(X, w_h, w_h2, w_o, p_keep_input, p_keep_hidden):
@@ -30,25 +30,27 @@ def model(X, w_h, w_h2, w_o, p_keep_input, p_keep_hidden):
 
 sess = tf.InteractiveSession()
 
-train_data = Data(0,100)
-train_data = train_data.reshape(train_data.shape[0]*train_data.shape[1],train_data.shape[2])
-test_data = Data(200,300)
-test_data = test_data.reshape(test_data.shape[0]*test_data.shape[1],test_data.shape[2])
+data = seqData()
+train_data = data[0:9000,:]
+test_data = data[9000:,:]
+#train_data = data[0:900,:]
+#test_data = data[900:1000,:]
 
-trX = train_data[:,0:7]
-trY = train_data[:,7:]
-teX = test_data[:,0:7]
-teY = test_data[:,7:]
+
+trX = train_data[:,:34]
+trY = train_data[:,34:]
+teX = test_data[:,:34]
+teY = test_data[:,34:]
 
 print ("Loaded data")
 
-X = tf.placeholder(tf.float32, shape=[None, 7])
+X = tf.placeholder(tf.float32, shape=[None, 34])
 Y = tf.placeholder(tf.float32, shape=[None, 3])
 
 #Step 3 - Initialize weights
-w_h = init_weights([7, 625], "w_h")
-w_h2 = init_weights([625, 625], "w_h2")
-w_o = init_weights([625, 3], "w_o")
+w_h = init_weights([34, 85], "w_h")
+w_h2 = init_weights([85, 85], "w_h2")
+w_o = init_weights([85, 3], "w_o")
 
 #Step 4 - Add histogram summaries for weights
 tf.summary.histogram("w_h_summ", w_h)
@@ -66,8 +68,9 @@ py_x = model(X, w_h, w_h2, w_o, p_keep_input, p_keep_hidden)
 with tf.name_scope("cost"):
     cost = tf.reduce_mean(tf.square(py_x - Y))
     #cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=py_x, labels=Y))
-    #train_op = tf.train.RMSPropOptimizer(0.001, 0.9).minimize(cost)
-    train_op = tf.train.GradientDescentOptimizer(0.5).minimize(cost)
+    #train_op = tf.train.RMSPropOptimizer(0.1, 0.9).minimize(cost)
+    #train_op = tf.train.GradientDescentOptimizer(0.5).minimize(cost)
+    train_op = tf.train.AdamOptimizer().minimize(cost)
     # Add scalar summary for cost tensor
     tf.summary.scalar("cost", cost)
 
@@ -92,11 +95,13 @@ with tf.Session() as sess:
     for i in range(100):
         for start, end in zip(range(0, len(trX), 128), range(128, len(trX)+1, 128)):
             sess.run(train_op, feed_dict={X: trX[start:end], Y: trY[start:end],
+                                          p_keep_input: 1.0, p_keep_hidden: 0.5})
+        summary, train_acc = sess.run([merged, cost], feed_dict={X: trX, Y: trY,
                                           p_keep_input: 1.0, p_keep_hidden: 1.0})
-        summary, acc = sess.run([merged, acc_op], feed_dict={X: teX, Y: teY,
+        summary, test_acc = sess.run([merged, cost], feed_dict={X: teX, Y: teY,
                                           p_keep_input: 1.0, p_keep_hidden: 1.0})
         writer.add_summary(summary, i)  # Write summary
-        print(i, acc)                   # Report the accuracy
+        print ('%.12f, %.12f' % (train_acc, test_acc))                   # Report the accuracy
 
 # # Weights and biases of our model
 # W1 = weight_variable([7,10])
