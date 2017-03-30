@@ -31,8 +31,19 @@ w_o = np.load('w_o.npy')
 data = seqData()
 test_data = np.array(data[9002,:34])
 
+colors = cm.rainbow(np.linspace(0, 1, len(x)))
+fig = plt.figure()
+ax = plt.axes(projection='3d')
 
-for i in range(100):
+
+
+# fig2 = plt.figure(num=0)
+# ax = plt.axes()
+# ax.scatter(x,y,c=colors)
+# pylab.show()
+# for i in range(100):
     output = iterate_nn(test_data)
     test_data = update_traj(test_data,output)
     print (test_data)
+    ax.scatter(output[0], output[1], output[2], c=colors)
+pylab.show()
