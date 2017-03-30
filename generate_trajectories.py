@@ -8,7 +8,6 @@ def sigmoid(z):
     return s
 
 def iterate_nn(input):
-    test_data = np.array(data[9002,:34])
     h = sigmoid(np.dot(input,w_h))
     h2 = sigmoid(np.dot(h, w_h2))
     output = np.dot(h2, w_o)
@@ -16,7 +15,6 @@ def iterate_nn(input):
 
 def update_traj(current, next_point):
     num_of_points = int((len(current) - 4)/3)
-    print (num_of_points)
     for i in range(num_of_points - 1):
         current[i*3:(i+1)*3] = current[(i+1)*3:(i+2)*3]
     current[(num_of_points-1)*3:num_of_points*3] = next_point
@@ -29,11 +27,21 @@ w_h2 = np.load('w_h2.npy')
 w_o = np.load('w_o.npy')
 
 data = seqData()
-test_data = np.array(data[9002,:34])
 
-colors = cm.rainbow(np.linspace(0, 1, len(x)))
+size = 10
+start = 0
+colors = cm.rainbow(np.linspace(0, 1, size))
 fig = plt.figure()
-ax = plt.axes(projection='3d')
+ax = plt.axes()
+ax.scatter(data[start:start+size,34],data[start:start+size,35],c=colors)
+pylab.show()
+
+
+
+test_data = np.array(data[start,:34])
+colors = cm.rainbow(np.linspace(0, 1, size))
+fig = plt.figure()
+ax = plt.axes()
 
 
 
@@ -41,9 +49,17 @@ ax = plt.axes(projection='3d')
 # ax = plt.axes()
 # ax.scatter(x,y,c=colors)
 # pylab.show()
-# for i in range(100):
+x = []
+y = []
+x.append(data[start,34])
+y.append(data[start,35])
+for i in range(size):
     output = iterate_nn(test_data)
     test_data = update_traj(test_data,output)
-    print (test_data)
-    ax.scatter(output[0], output[1], output[2], c=colors)
+    print (output)
+    #print (test_data)
+    #ax.scatter(output[0], output[1], output[2], c=colors)
+    x.append(output[0])
+    y.append(output[1])
+ax.scatter(x,y,c=colors)
 pylab.show()

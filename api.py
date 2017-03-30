@@ -141,16 +141,17 @@ def seqData():
     return data
 
 
-files = getAllFiles()
-print (len(files))
-print (varsFromFile(files,210))
-print (fileFromVars(0.1,0.1,0.1,0.7))
+#files = getAllFiles()
+#print (len(files))
+#print (varsFromFile(files,210))
+#print (fileFromVars(0.1,0.1,0.1,0.7))
 #for i in range(0,10):
-#     plot(210, files, every=1, filename=fileFromVars(0.1,i/10.0,0.1,0.1))
-clearData()
+#     plot(210, files, every=1, filename=fileFromVars(0.1,0.1,0.1,i/10.0))
+#clearData()
 #sequenceData(fileFromVars(0.1,0.1,0.1,0.9),3)
-
-for i in range(0,10):
-    sequenceData(fileFromVars(0.1,i/10.0,0.1,0.9),10)
-data = seqData()
-print (len(data))
+# for rest in range(0,10):
+#     for fric in range(0,10):
+#         for tilt in range(0,10):
+#             sequenceData(fileFromVars(1/10.0,rest/10.0,fric/10.0,tilt/10.0),10)
+# data = seqData()
+# print (len(data))

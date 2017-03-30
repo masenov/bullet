@@ -15,7 +15,7 @@ def init_weights(shape, name):
     return tf.Variable(tf.random_normal(shape, stddev=0.1), name=name)
 
 # This network is the same as the previous one except with an extra hidden layer + dropout
-def model(X, w_h, w_h2, w_o, p_keep_input, p_keep_hidden):
+def model(X, w_h, w_h2, w_h3, w_o, p_keep_input, p_keep_hidden):
     # Add layer name scopes for better graph visualization
     with tf.name_scope("layer1"):
         X = tf.nn.dropout(X, p_keep_input)
@@ -24,6 +24,9 @@ def model(X, w_h, w_h2, w_o, p_keep_input, p_keep_hidden):
         h = tf.nn.dropout(h, p_keep_hidden)
         h2 = tf.nn.sigmoid(tf.matmul(h, w_h2))
     with tf.name_scope("layer3"):
+        h = tf.nn.dropout(h, p_keep_hidden)
+        h2 = tf.nn.sigmoid(tf.matmul(h, w_h3))
+    with tf.name_scope("layer4"):
         h2 = tf.nn.dropout(h2, p_keep_hidden)
         return tf.matmul(h2, w_o)
 
@@ -31,8 +34,8 @@ def model(X, w_h, w_h2, w_o, p_keep_input, p_keep_hidden):
 sess = tf.InteractiveSession()
 
 data = seqData()
-train_data = data[0:9000,:]
-test_data = data[9000:,:]
+train_data = data[0:900000,:]
+test_data = data[900000:,:]
 
 
 trX = train_data[:,:34]
@@ -46,13 +49,15 @@ X = tf.placeholder(tf.float32, shape=[None, 34])
 Y = tf.placeholder(tf.float32, shape=[None, 3])
 
 #Step 3 - Initialize weights
-w_h = init_weights([34, 85], "w_h")
-w_h2 = init_weights([85, 85], "w_h2")
-w_o = init_weights([85, 3], "w_o")
+w_h = init_weights([34, 185], "w_h")
+w_h2 = init_weights([185, 185], "w_h2")
+w_h3 = init_weights([185, 185], "w_h3")
+w_o = init_weights([185, 3], "w_o")
 
 #Step 4 - Add histogram summaries for weights
 tf.summary.histogram("w_h_summ", w_h)
 tf.summary.histogram("w_h2_summ", w_h2)
+tf.summary.histogram("w_h3_summ", w_h3)
 tf.summary.histogram("w_o_summ", w_o)
 
 #Step 5 - Add dropout to input and hidden layers
@@ -60,7 +65,7 @@ p_keep_input = tf.placeholder("float", name="p_keep_input")
 p_keep_hidden = tf.placeholder("float", name="p_keep_hidden")
 
 #Step 6 - Create Model
-py_x = model(X, w_h, w_h2, w_o, p_keep_input, p_keep_hidden)
+py_x = model(X, w_h, w_h2, w_h3, w_o, p_keep_input, p_keep_hidden)
 
 #Step 7 Create cost function
 with tf.name_scope("cost"):
@@ -90,7 +95,7 @@ with tf.Session() as sess:
     tf.global_variables_initializer().run()
 
     #Step 12 train the  model
-    for i in range(100):
+    for i in range(1000):
         for start, end in zip(range(0, len(trX), 128), range(128, len(trX)+1, 128)):
             sess.run(train_op, feed_dict={X: trX[start:end], Y: trY[start:end],
                                           p_keep_input: 1.0, p_keep_hidden: 0.5})
@@ -102,6 +107,7 @@ with tf.Session() as sess:
         print ('%.12f, %.12f' % (train_acc, test_acc))                   # Report the accuracy
     np.save('w_h',w_h.eval())
     np.save('w_h2',w_h2.eval())
+    np.save('w_h3',w_h3.eval())
     np.save('w_o',w_o.eval())
 
 
