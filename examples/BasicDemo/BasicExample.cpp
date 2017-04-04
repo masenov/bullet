@@ -7,17 +7,22 @@
 #include "LinearMath/btAlignedObjectArray.h"
 #include "../CommonInterfaces/CommonRigidBodyBase.h"
 #include <fstream>
+#include <stdlib.h>     /* srand, rand */
 //using namespace std;
 static btRigidBody* ramp = NULL;
 static btRigidBody* gSphere = NULL;
-static btScalar gTilt = 40.5f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
-static btScalar gRampFriction = 0.9; // set ramp friction to 1
-static btScalar gRampRestitution = 0.9; // set ramp restitution to 0 (no restitution)
-static btScalar gSphereFriction = 0.9; // set sphere friction to 1
+static btScalar gTilt = 0.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
+static btScalar gRampFriction = 0.0; // set ramp friction to 1
+static btScalar gRampRestitution = 0.0; // set ramp restitution to 0 (no restitution)
+static btScalar gSphereFriction = 0.0; // set sphere friction to 1
 static btScalar gSphereRollingFriction =0.368; // set sphere rolling friction to 1
-static btScalar gSphereRestitution = 0.9; // set sphere restitution to 0
-static btScalar sphereMass = 0.9f;
-static std::string filename = "experiments/data_rest0.9fric_0.9tilt40.5mass0.9.txt";
+static btScalar gSphereRestitution = 0.0; // set sphere restitution to 0
+static btScalar sphereMass = 0.0f;
+static std::string filename = "experiments2/data_rest0.0fric_0.0tilt0.0mass0.0exp0.txt";
+
+float rnd () {
+  return (((double)rand()) / RAND_MAX) * 20 - 10;
+    };
 
 struct BasicExample : public CommonRigidBodyBase
 {
@@ -32,7 +37,7 @@ struct BasicExample : public CommonRigidBodyBase
 
   void resetCamera()
 	{
-		float dist = 4;
+		float dist = 20;
 		float pitch = 52;
 		float yaw = 35;
 		float targetPos[3]={-6,6,-6};
@@ -40,14 +45,15 @@ struct BasicExample : public CommonRigidBodyBase
 	}
 };
 
+
+
 void BasicExample::stepSimulation(float deltaTime)
 {
   std::ofstream myfile;
   myfile.open (filename,std::ios::app);
-  //myfile << "Writing this to a file.\n";
-  std::string s = std::to_string(gSphere->getCenterOfMassPosition()[0]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[1]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[2]) + ", ";
+  std::string s = std::to_string(gSphere->getCenterOfMassPosition()[0]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[1]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[2]) + ", " + std::to_string(gSphere->getLinearVelocity()[0]) + ", " + std::to_string(gSphere->getLinearVelocity()[1]) + ", " + std::to_string(gSphere->getLinearVelocity()[2]) + ", ";
   m_dynamicsWorld->stepSimulation(4./240,0);
-  s +=  std::to_string(gTilt) + ", "  + std::to_string(sphereMass) + ", " + std::to_string(gSphereFriction) + ", " + std::to_string(gRampRestitution) + "," + std::to_string(gSphere->getCenterOfMassPosition()[0]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[1]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[2]) + "\n";
+  s +=  std::to_string(gTilt) + ", "  + std::to_string(sphereMass) + ", " + std::to_string(gSphereFriction) + ", " + std::to_string(gRampRestitution) + "," + std::to_string(gSphere->getCenterOfMassPosition()[0]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[1]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[2]) + ", " + std::to_string(gSphere->getLinearVelocity()[0]) + ", " + std::to_string(gSphere->getLinearVelocity()[1]) + ", " + std::to_string(gSphere->getLinearVelocity()[2]) + "\n";
   myfile << s;
   myfile.close();
     //       b3Printf("Velocity = %f,%f,%f,%f,%f,%f\n",gSphere->getAngularVelocity()[0],
@@ -58,6 +64,8 @@ void BasicExample::stepSimulation(float deltaTime)
     //                gSphere->getCenterOfMassPosition()[2]);
 
     // //CommonRigidBodyBase::stepSimulation(deltaTime);
+  //printf ("Velocity = %f,%f,%f,%f,%f,%f\n",gSphere->getLinearVelocity()[0], gSphere->getLinearVelocity()[1], gSphere->getLinearVelocity()[2], gSphere->getCenterOfMassPosition()[0], gSphere->getCenterOfMassPosition()[1], gSphere->getCenterOfMassPosition()[2]);
+  //printf ("%f\n", rnd());
 }
 
 void BasicExample::initPhysics()
@@ -90,7 +98,7 @@ void BasicExample::initPhysics()
 		btScalar mass(0.);
 		createRigidBody(mass,groundTransform,groundShape, btVector4(0,0,1,1));
 	}
-
+  /*
   { //create a static inclined plane
 		btBoxShape* inclinedPlaneShape = createBoxShape(btVector3(btScalar(20.),btScalar(1.),btScalar(10.)));
 		m_collisionShapes.push_back(inclinedPlaneShape);
@@ -113,9 +121,11 @@ void BasicExample::initPhysics()
 		ramp->setFriction(gRampFriction);
 		ramp->setRestitution(gRampRestitution);
 	}
+ 
+  */
   { //create a static inclined plane
     static btRigidBody* ramp2 = NULL;
-		btBoxShape* inclinedPlaneShape2 = createBoxShape(btVector3(btScalar(180.),btScalar(1.),btScalar(180.)));
+		btBoxShape* inclinedPlaneShape2 = createBoxShape(btVector3(btScalar(380.),btScalar(1.),btScalar(380.)));
 		m_collisionShapes.push_back(inclinedPlaneShape2);
 
 		btTransform startTransform2;
@@ -146,14 +156,14 @@ void BasicExample::initPhysics()
 
 		btScalar sphereMass(.1f);
 
-		startTransform.setOrigin(
-                             btVector3(btScalar(8), btScalar(15), btScalar(4)));
+		startTransform.setOrigin(btVector3(btScalar(18), btScalar(15), btScalar(14)));
 
 		gSphere = createRigidBody(sphereMass, startTransform, sphereShape);
 		gSphere->forceActivationState(DISABLE_DEACTIVATION); // to prevent the sphere on the ramp from disabling
 		gSphere->setFriction(gSphereFriction);
 		gSphere->setRestitution(gSphereRestitution);
 		gSphere->setRollingFriction(gSphereRollingFriction);
+    gSphere->setLinearVelocity(btVector3(btScalar(rnd()), btScalar(rnd()), btScalar(rnd())));
     //gSphere->setContactStiffnessAndDamping(100,1);
 	}
 	  	m_guiHelper->autogenerateGraphicsObjects(m_dynamicsWorld);

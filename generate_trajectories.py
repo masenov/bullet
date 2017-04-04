@@ -10,7 +10,8 @@ def sigmoid(z):
 def iterate_nn(input):
     h = sigmoid(np.dot(input,w_h))
     h2 = sigmoid(np.dot(h, w_h2))
-    output = np.dot(h2, w_o)
+    h3 = sigmoid(np.dot(h2, w_h3))
+    output = np.dot(h3, w_o)
     return output
 
 def update_traj(current, next_point):
@@ -24,12 +25,13 @@ def update_traj(current, next_point):
 
 w_h = np.load('w_h.npy')
 w_h2 = np.load('w_h2.npy')
+w_h3 = np.load('w_h3.npy')
 w_o = np.load('w_o.npy')
 
-data = seqData()
-
-size = 10
-start = 0
+#data = seqData()
+data = np.load('data.npy')
+size = 1000
+start = 384343
 colors = cm.rainbow(np.linspace(0, 1, size))
 fig = plt.figure()
 ax = plt.axes()
