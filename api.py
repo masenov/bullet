@@ -9,7 +9,7 @@ import matplotlib.cm as cm
 import pylab
 
 def getAllFiles():
-    directory = 'build_cmake/experiments'
+    directory = 'build_cmake/experiments2'
     files = os.listdir(directory)
     return files
 
@@ -19,20 +19,22 @@ def varsFromFile(files, fileNumber):
     fric_pos = file.find('fric')
     tilt_pos = file.find('tilt')
     mass_pos = file.find('mass')
+    exp_pos = file.find('exp')
     end_pos = file.find('.txt')
     rest = float(file[rest_pos:fric_pos])
     fric = float(file[fric_pos+5:tilt_pos])
     tilt = float(file[tilt_pos+4:mass_pos])
-    mass = float(file[mass_pos+4:end_pos])
+    #mass = float(file[mass_pos+4:end_pos])
+    mass = float(file[mass_pos+4:exp_pos])
     return (rest,fric,tilt,mass)
 
 def fileFromVars(mass, rest, fric, tilt):
    tilt = tilt*45.0
-   filename = "data_rest" + str(rest) + "fric_" + str(fric) + "tilt" + str(tilt)+ "mass"+str(mass)+ ".txt"
+   filename = "data_rest" + str(rest) + "fric_" + str(fric) + "tilt" + str(tilt)+ "mass"+str(mass)+ "exp0.txt"
    return filename
 
 def loadData(files, fileNumber):
-    directory = 'build_cmake/experiments'
+    directory = 'build_cmake/experiments2'
     file = files[fileNumber]
     data = np.zeros((1000,10))
     count = 0
@@ -95,29 +97,35 @@ def clearData():
 
 def sequenceData(filename, length):
     count = 0
-    data = np.zeros((3,length))
+    data = np.zeros((6,length))
     print (filename)
-    with open('build_cmake/experiments/' + filename, 'rt') as csvfile:
+    with open('build_cmake/experiments2/' + filename, 'rt') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in spamreader:
             if count < length:
                 data[0,count] = float(row[0])
                 data[1,count] = float(row[1])
                 data[2,count] = float(row[2])
+                data[3,count] = float(row[3])
+                data[4,count] = float(row[4])
+                data[5,count] = float(row[5])
                 count += 1
             else:
                 with open('data.txt', 'a') as fout:
                     for i in range(length):
-                        for j in range(3):
+                        for j in range(6):
                             fout.writelines(str(data[j,i]) + ', ')
-                    for i in range(6):
-                        fout.writelines(row[i+3] + ', ')
-                    fout.writelines(row[9])
+                    for i in range(9):
+                        fout.writelines(row[i+6] + ', ')
+                    fout.writelines(row[15])
                     fout.writelines('\n')
                 data[:,:length-1] = data[:,1:]
-                data[0,length-1] = float(row[7])
-                data[1,length-1] = float(row[8])
-                data[2,length-1] = float(row[9])
+                data[0,length-1] = float(row[10])
+                data[1,length-1] = float(row[11])
+                data[2,length-1] = float(row[12])
+                data[3,length-1] = float(row[13])
+                data[4,length-1] = float(row[14])
+                data[5,length-1] = float(row[15])
 
 def seqData():
     file = 'data.txt'
@@ -141,17 +149,29 @@ def seqData():
     return data
 
 
-#files = getAllFiles()
-#print (len(files))
-#print (varsFromFile(files,210))
-#print (fileFromVars(0.1,0.1,0.1,0.7))
+def deteleFiles(files):
+    for i in range(10000):
+        file = files[i]
+        exp_pos = file.find('exp')
+        keep_file = file[exp_pos+3]
+        if keep_file != '0':
+            os.remove('build_cmake/experiments2/' + file)
+
+    print (len(files))
+
+
+files = getAllFiles()
+print (len(files))
+print (files[0])
+print (varsFromFile(files,0))
+print (fileFromVars(0.1,0.1,0.1,0.7))
 #for i in range(0,10):
 #     plot(210, files, every=1, filename=fileFromVars(0.1,0.1,0.1,i/10.0))
-#clearData()
+clearData()
 #sequenceData(fileFromVars(0.1,0.1,0.1,0.9),3)
-# for rest in range(0,10):
-#     for fric in range(0,10):
-#         for tilt in range(0,10):
-#             sequenceData(fileFromVars(1/10.0,rest/10.0,fric/10.0,tilt/10.0),10)
-# data = seqData()
-# print (len(data))
+for rest in range(0,10):
+    for fric in range(0,10):
+         for tilt in range(0,1):
+             sequenceData(fileFromVars(0/10.0,rest/10.0,fric/10.0,tilt/10.0),10)
+data = seqData()
+print (len(data))
