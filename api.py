@@ -8,8 +8,10 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import pylab
 
+folder = 'experiments3'
+
 def getAllFiles():
-    directory = 'build_cmake/experiments2'
+    directory = 'build_cmake/'+folder
     files = os.listdir(directory)
     return files
 
@@ -28,14 +30,17 @@ def varsFromFile(files, fileNumber):
     mass = float(file[mass_pos+4:exp_pos])
     return (rest,fric,tilt,mass)
 
-def fileFromVars(mass, rest, fric, tilt):
+def fileFromVars(mass, rest, fric, tilt, exp):
    tilt = tilt*45.0
-   filename = "data_rest" + str(rest) + "fric_" + str(fric) + "tilt" + str(tilt)+ "mass"+str(mass)+ "exp0.txt"
+   filename = "data_rest" + str(rest) + "fric_" + str(fric) + "tilt" + str(tilt)+ "mass"+str(mass)+ "exp" + str(exp) + ".txt"
    return filename
 
-def loadData(files, fileNumber):
-    directory = 'build_cmake/experiments2'
-    file = files[fileNumber]
+def loadData(files, fileNumber, filename=None):
+    directory = 'build_cmake/'+folder
+    if filename==None:
+        file = files[fileNumber]
+    else:
+        file = filename
     data = np.zeros((1000,10))
     count = 0
     with open(directory + '/' + file, 'rt') as csvfile:
@@ -57,6 +62,25 @@ def Data(start,end):
         train[i,:,:] = loadData(files,start+i)
     return train
 
+
+def startOfFile(filename,start=1):
+    count = 0
+    data = np.zeros(16)
+    with open('build_cmake/' + folder + '/' + filename, 'rt') as csvfile:
+        spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        for row in spamreader:
+            if count<start:
+                count += 1
+                continue
+            data[(count-start)*6:(count-start)*6+6] = row[0:6]
+            count += 1
+            if count==start+2:
+                data[12:16] = row[6:10]
+                break
+    return data
+
+
+
 def plot(fileNumber, files, filename=None, every=1):
     if filename is None:
         file = files[fileNumber]
@@ -66,7 +90,7 @@ def plot(fileNumber, files, filename=None, every=1):
     y = []
     z = []
     count = 0
-    with open('build_cmake/experiments/' + file, 'rt') as csvfile:
+    with open('build_cmake' + folder + '/' + file, 'rt') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in spamreader:
             count += 1
@@ -77,17 +101,17 @@ def plot(fileNumber, files, filename=None, every=1):
                 count = 0
 
     colors = cm.rainbow(np.linspace(0, 1, len(x)))
-    # fig = plt.figure()
-    # ax = plt.axes(projection='3d')
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
 
 
 
-    # ax.scatter(x, y, z, c=colors)
-    # pylab.show()
+    ax.scatter(x, y, z, c=colors)
+    pylab.show(block=False)
     fig2 = plt.figure(num=0)
     ax = plt.axes()
     ax.scatter(x,y,c=colors)
-    pylab.show()
+    pylab.show(block=False)
 
 def clearData():
     with open('data.txt', 'w') as fout:
@@ -96,12 +120,14 @@ def clearData():
 
 
 def sequenceData(filename, length):
+    count2 = 0
     count = 0
     data = np.zeros((6,length))
     print (filename)
-    with open('build_cmake/experiments2/' + filename, 'rt') as csvfile:
+    with open('build_cmake/' + folder + '/' + filename, 'rt') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in spamreader:
+            count2 += 1
             if count < length:
                 data[0,count] = float(row[0])
                 data[1,count] = float(row[1])
@@ -127,20 +153,20 @@ def sequenceData(filename, length):
                 data[4,length-1] = float(row[14])
                 data[5,length-1] = float(row[15])
 
-def seqData():
-    file = 'data.txt'
+def seqData(filename):
+    file = filename + '.txt'
 
-    num_lines = sum(1 for line in open('data.txt'))
+    num_lines = sum(1 for line in open(filename + '.txt'))
 
-    with open('data.txt', 'rt') as csvfile:
+    with open(filename + '.txt', 'rt') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in spamreader:
             len_data = len(row)
             break
-
+    print (len_data)
     data = np.zeros((num_lines,len_data))
     count = 0
-    with open('data.txt', 'rt') as csvfile:
+    with open(filename + '.txt', 'rt') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in spamreader:
             for i in range(len_data):
@@ -155,23 +181,23 @@ def deteleFiles(files):
         exp_pos = file.find('exp')
         keep_file = file[exp_pos+3]
         if keep_file != '0':
-            os.remove('build_cmake/experiments2/' + file)
+            os.remove('build_cmake/' + folder + '/' + file)
 
     print (len(files))
 
 
-files = getAllFiles()
-print (len(files))
-print (files[0])
-print (varsFromFile(files,0))
-print (fileFromVars(0.1,0.1,0.1,0.7))
-#for i in range(0,10):
+# files = getAllFiles()
+# print (len(files))
+# print (files[0])
+# print (varsFromFile(files,0))
+# print (fileFromVars(0.1,0.1,0.1,0.7,20))
+# #for i in range(0,10):
 #     plot(210, files, every=1, filename=fileFromVars(0.1,0.1,0.1,i/10.0))
-clearData()
-#sequenceData(fileFromVars(0.1,0.1,0.1,0.9),3)
-for rest in range(0,10):
-    for fric in range(0,10):
-         for tilt in range(0,1):
-             sequenceData(fileFromVars(0/10.0,rest/10.0,fric/10.0,tilt/10.0),10)
-data = seqData()
-print (len(data))
+# clearData()
+# for rest in range(0,10):
+#     for fric in range(0,10):
+#          for tilt in range(0,1):
+#              for exp in range(0,100):
+#                  sequenceData(fileFromVars(0/10.0,rest/10.0,fric/10.0,tilt/10.0,exp),2)
+# data = seqData()
+# print (len(data))

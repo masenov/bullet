@@ -20,7 +20,7 @@ static btScalar gSphereFriction = 0.9; // set sphere friction to 1
 static btScalar gSphereRollingFriction =0.368; // set sphere rolling friction to 1
 static btScalar gSphereRestitution = 0.9; // set sphere restitution to 0
 static btScalar sphereMass = 0.0f;
-static std::string filename = "experiments2/data_rest0.9fric_0.9tilt0.0mass0.0exp99.txt";
+static std::string filename = "experiments3/data_rest0.9fric_0.9tilt0.0mass0.0exp99.txt";
 
 float rnd (int seed) {
   srand ( (unsigned) time(0) + seed );
@@ -52,14 +52,14 @@ struct BasicExample : public CommonRigidBodyBase
 
 void BasicExample::stepSimulation(float deltaTime)
 {
-  //std::ofstream myfile;
-  // myfile.open (filename,std::ios::app);
-  // std::string s = std::to_string(gSphere->getCenterOfMassPosition()[0]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[1]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[2]) + ", " + std::to_string(gSphere->getLinearVelocity()[0]) + ", " + std::to_string(gSphere->getLinearVelocity()[1]) + ", " + std::to_string(gSphere->getLinearVelocity()[2]) + ", ";
+  std::ofstream myfile;
+  myfile.open (filename,std::ios::app);
+  std::string s = std::to_string(gSphere->getCenterOfMassPosition()[0]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[1]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[2]) + ", " + std::to_string(gSphere->getLinearVelocity()[0]) + ", " + std::to_string(gSphere->getLinearVelocity()[1]) + ", " + std::to_string(gSphere->getLinearVelocity()[2]) + ", ";
   m_dynamicsWorld->stepSimulation(4./240,0);
-  // s +=  std::to_string(gTilt) + ", "  + std::to_string(sphereMass) + ", " + std::to_string(gSphereFriction) + ", " + std::to_string(gRampRestitution) + "," + std::to_string(gSphere->getCenterOfMassPosition()[0]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[1]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[2]) + ", " + std::to_string(gSphere->getLinearVelocity()[0]) + ", " + std::to_string(gSphere->getLinearVelocity()[1]) + ", " + std::to_string(gSphere->getLinearVelocity()[2]) + "\n";
-  // myfile << s;
-  // myfile.close();
-  //       b3Printf("Velocity = %f,%f,%f,%f,%f,%f\n",gSphere->getAngularVelocity()[0],
+  s +=  std::to_string(gTilt) + ", "  + std::to_string(sphereMass) + ", " + std::to_string(gSphereFriction) + ", " + std::to_string(gRampRestitution) + "," + std::to_string(gSphere->getCenterOfMassPosition()[0]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[1]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[2]) + ", " + std::to_string(gSphere->getLinearVelocity()[0]) + ", " + std::to_string(gSphere->getLinearVelocity()[1]) + ", " + std::to_string(gSphere->getLinearVelocity()[2]) + "\n";
+  myfile << s;
+  myfile.close();
+  //    b3Printf("Velocity = %f,%f,%f,%f,%f,%f\n",gSphere->getAngularVelocity()[0],
     //                gSphere->getAngularVelocity()[1],
     //                gSphere->getAngularVelocity()[2],
     //                gSphere->getCenterOfMassPosition()[0],

@@ -26,15 +26,15 @@ for i in range(100):
                     gSphereFriction = fric/10.0
                     gTilt = tilt/10.0*45.0
                     sphereMass = mass/10.0
-                    filename = "experiments2/data_rest" + str(gRampRestitution) + "fric_" + str(gRampFriction) + "tilt" + str(gTilt)+ "mass"+str(sphereMass)+"exp"+str(i)+".txt"
+                    filename = "experiments3/data_rest" + str(gRampRestitution) + "fric_" + str(gRampFriction) + "tilt" + str(gTilt)+ "mass"+str(sphereMass)+"exp"+str(i)+".txt"
 
                     variables = ['static btScalar gTilt = ' + str(gTilt) + 'f/180.0f*SIMD_PI; // tilt the ramp 20 degrees\n', 'static btScalar gRampFriction = ' + str(gRampFriction) + '; // set ramp friction to 1\n', 'static btScalar gRampRestitution = ' + str(gRampRestitution) + '; // set ramp restitution to 0 (no restitution)\n', 'static btScalar gSphereFriction = ' + str(gSphereFriction) + '; // set sphere friction to 1\n', 'static btScalar gSphereRollingFriction =' + str(gSphereRollingFriction) + '; // set sphere rolling friction to 1\n', 'static btScalar gSphereRestitution = ' + str(gSphereRestitution) + '; // set sphere restitution to 0\n', 'static btScalar sphereMass = ' + str(sphereMass) + 'f;\n', 'static std::string filename = "'+filename+'";\n']
 
                     print (variables)
                     with open('examples/BasicDemo/BasicExample.cpp', 'w') as fout:
-                        fout.writelines(data[0:13])
+                        fout.writelines(data[0:15])
                         fout.writelines(variables)
-                        fout.writelines(data[21:])
+                        fout.writelines(data[23:])
 
                     #os.system("./basedemo.sh")
                     import subprocess
