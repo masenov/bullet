@@ -13,18 +13,20 @@ def relu(z):
     return z
 
 def iterate_nn(input):
-    h = relu(np.dot(input,w_h))
-    h2 = relu(np.dot(h, w_h2))
-    #h3 = relu(np.dot(h2, w_h3))
-    #h4 = relu(np.dot(h3, w_h4))
-    output = np.dot(h2, w_h3)
-    return output
+    for i in range(len(weights)):
+        if i == 0:
+            h = relu(np.dot(input,weights[i]))
+        elif i == len(weights) - 1:
+            h = np.dot(h, weights[i])
+        else:
+            h = relu(np.dot(h,weights[i]))
+    return h
 
 def update_traj(current, next_point):
-    num_of_points = int((len(current) - 4)/6)
+    num_of_points = int((len(current) - 4)/3)
     for i in range(num_of_points - 1):
-        current[i*6:(i+1)*6] = current[(i+1)*6:(i+2)*6]
-    current[(num_of_points-1)*6:num_of_points*6] = next_point
+        current[i*3:(i+1)*3] = current[(i+1)*3:(i+2)*3]
+    current[(num_of_points-1)*3:num_of_points*3] = next_point
     return current
 
 def getPoint(filename, length):
@@ -51,19 +53,17 @@ def getPoint(filename, length):
                     output.append(float(row[i+6]))
                 return output
 
-
-w_h = np.load('nn_weights/w2_0.npy')
-w_h2 = np.load('nn_weights/w2_1.npy')
-w_h3 = np.load('nn_weights/w2_2.npy')
-#w_h4 = np.load('nn_weights/w_3.npy')
-#w_o = np.load('nn_weights/w_4.npy')
-file = fileFromVars(0.0, 0.8, 0.8, 0.0, 7)
+weights = []
+for i in range(7):
+    w = np.load('nn_weights/w_' + str(i) + '_49000.npy')
+    weights.append(w)
+file = fileFromVars(0.0, 0.0, 0.0, 0.0, 8)
 print (file)
 start = getPoint(file,2)
 print (start)
 data = loadData(0,0,file)
 size = 100
-
+#import pdb; pdb.set_trace()
 colors = cm.rainbow(np.linspace(0, 1, size))
 fig = plt.figure()
 ax = plt.axes()
@@ -72,12 +72,13 @@ pylab.show()
 
 
 
-test_data = np.array(start)
+test_data = np.array(start[3:])
 colors = cm.rainbow(np.linspace(0, 1, size))
 fig = plt.figure()
 ax = plt.axes()
 
-
+start_x = start[0]
+start_y = start[1]
 
 # fig2 = plt.figure(num=0)
 # ax = plt.axes()
@@ -85,15 +86,17 @@ ax = plt.axes()
 # pylab.show()
 x = []
 y = []
-x.append(start[0])
-y.append(start[1])
+#x.append(start[0])
+#y.append(start[1])
 for i in range(size):
     output = iterate_nn(test_data)
     test_data = update_traj(test_data,output)
     print (output)
     #print (test_data)
     #ax.scatter(output[0], output[1], output[2], c=colors)
-    x.append(output[0])
-    y.append(output[1])
+    start_x = start_x + output[0]/60.0
+    start_y = start_y + output[1]/60.0
+    x.append(start_x)
+    y.append(start_y)
 ax.scatter(x,y,c=colors)
 pylab.show()

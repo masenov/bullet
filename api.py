@@ -3,12 +3,12 @@ import csv
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib
 import numpy as np
-matplotlib.use('TkAgg') 
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import pylab
 
-folder = 'experiments3'
+folder = 'only_ball'
 
 def getAllFiles():
     directory = 'build_cmake/'+folder
@@ -90,7 +90,7 @@ def plot(fileNumber, files, filename=None, every=1):
     y = []
     z = []
     count = 0
-    with open('build_cmake' + folder + '/' + file, 'rt') as csvfile:
+    with open('build_cmake/' + folder + '/' + file, 'rt') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in spamreader:
             count += 1
@@ -107,11 +107,12 @@ def plot(fileNumber, files, filename=None, every=1):
 
 
     ax.scatter(x, y, z, c=colors)
-    pylab.show(block=False)
+    pylab.show(block=True)
     fig2 = plt.figure(num=0)
     ax = plt.axes()
     ax.scatter(x,y,c=colors)
-    pylab.show(block=False)
+    pylab.show(block=True)
+    print ('done')
 
 def clearData():
     with open('data.txt', 'w') as fout:
@@ -119,16 +120,20 @@ def clearData():
 
 
 
-def sequenceData(filename, length):
+def sequenceData(filename=None, length=2, fileNumber=None, files=None):
+    if fileNumber is not None:
+        filename = files[fileNumber]
     count2 = 0
     count = 0
     data = np.zeros((6,length))
+    take_data = False
     print (filename)
     with open('build_cmake/' + folder + '/' + filename, 'rt') as csvfile:
         spamreader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in spamreader:
-            count2 += 1
-            if count < length:
+            if float(row[1]) < 2.4:
+                take_data = True
+            if count < length and take_data:
                 data[0,count] = float(row[0])
                 data[1,count] = float(row[1])
                 data[2,count] = float(row[2])
@@ -137,14 +142,20 @@ def sequenceData(filename, length):
                 data[5,count] = float(row[5])
                 count += 1
             else:
-                with open('data.txt', 'a') as fout:
-                    for i in range(length):
-                        for j in range(6):
-                            fout.writelines(str(data[j,i]) + ', ')
-                    for i in range(9):
-                        fout.writelines(row[i+6] + ', ')
-                    fout.writelines(row[15])
-                    fout.writelines('\n')
+                if take_data:
+                    count2 += 1
+                    if count2 > 350:
+                        break
+                    with open('data.txt', 'a') as fout:
+                        for i in range(length):
+                            for j in range(6):
+                                fout.writelines(str(data[j,i]) + ', ')
+                        for i in range(9):
+                            fout.writelines(row[i+6] + ', ')
+                        fout.writelines(row[15])
+                        fout.writelines('\n')
+                        if float(row[1]) > 2.4:
+                            take_data = False
                 data[:,:length-1] = data[:,1:]
                 data[0,length-1] = float(row[10])
                 data[1,length-1] = float(row[11])
@@ -186,7 +197,7 @@ def deteleFiles(files):
     print (len(files))
 
 
-# files = getAllFiles()
+#files = getAllFiles()
 # print (len(files))
 # print (files[0])
 # print (varsFromFile(files,0))
@@ -201,3 +212,8 @@ def deteleFiles(files):
 #                  sequenceData(fileFromVars(0/10.0,rest/10.0,fric/10.0,tilt/10.0,exp),2)
 # data = seqData()
 # print (len(data))
+#plot(0, files, every=1)
+clearData()
+files = getAllFiles()
+for i in range(len(files)):
+    sequenceData(length=2, fileNumber=i, files=files)
