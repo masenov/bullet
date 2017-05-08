@@ -17,14 +17,14 @@ gSphereRestitution = 1.5
 
 for i in range(0,1):
     for mass in range(0,1):
-        for rest in range(25,50):
-            for fric in range(0,50):
-                for tilt in range(0,50):
-                    gRampRestitution = rest/50.0
-                    gSphereRestitution = rest/50.0
-                    gRampFriction = fric/50.0
-                    gSphereFriction = fric/50.0
-                    gTilt = tilt/50.0*45.0
+        for rest in range(10,20):
+            for fric in range(0,20):
+                for tilt in range(0,20):
+                    gRampRestitution = rest/20.0
+                    gSphereRestitution = rest/20.0
+                    gRampFriction = fric/20.0
+                    gSphereFriction = fric/20.0
+                    gTilt = tilt/20.0*45.0
                     sphereMass = mass/10.0
                     filename = "experiments5/data_rest" + str(gRampRestitution) + "fric_" + str(gRampFriction) + "tilt" + str(gTilt)+ "mass"+str(sphereMass)+"exp"+str(i)+".txt"
 
