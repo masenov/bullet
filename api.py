@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import pylab
 
-folder = 'only_ball'
+folder = 'experiments3'
 
 def getAllFiles():
     directory = 'build_cmake/'+folder
@@ -198,6 +198,7 @@ def deteleFiles(files):
 
 
 #files = getAllFiles()
+#plot(6210, files, every=1)
 # print (len(files))
 # print (files[0])
 # print (varsFromFile(files,0))
@@ -213,7 +214,7 @@ def deteleFiles(files):
 # data = seqData()
 # print (len(data))
 #plot(0, files, every=1)
-clearData()
-files = getAllFiles()
-for i in range(len(files)):
-    sequenceData(length=2, fileNumber=i, files=files)
+#clearData()
+#files = getAllFiles()
+#for i in range(len(files)):
+#    sequenceData(length=2, fileNumber=i, files=files)

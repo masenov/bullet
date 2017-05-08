@@ -13,20 +13,21 @@
 //using namespace std;
 static btRigidBody* ramp = NULL;
 static btRigidBody* gSphere = NULL;
-static btScalar gTilt = 0.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
+static btScalar gTilt = 12.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
 static btScalar gRampFriction = 0.9; // set ramp friction to 1
 static btScalar gRampRestitution = 0.9; // set ramp restitution to 0 (no restitution)
 static btScalar gSphereFriction = 0.9; // set sphere friction to 1
 static btScalar gSphereRollingFriction =0.368; // set sphere rolling friction to 1
 static btScalar gSphereRestitution = 0.9; // set sphere restitution to 0
 static btScalar sphereMass = 0.0f;
-static std::string filename = "experiments3/data_rest0.9fric_0.9tilt0.0mass0.0exp99.txt";
+static std::string filename = "test.txt";
 
 float rnd (int seed) {
   srand ( (unsigned) time(0) + seed );
   return (((double)rand()) / RAND_MAX) * 40 - 20;
     };
 
+static btRigidBody* ramp2 = NULL;
 struct BasicExample : public CommonRigidBodyBase
 {
 	BasicExample(struct GUIHelperInterface* helper)
@@ -48,7 +49,30 @@ struct BasicExample : public CommonRigidBodyBase
 	}
 };
 
-
+bool collision (btDynamicsWorld*	m_dynamicsWorld, btRigidBody* gSphere) {
+  int numManifolds = m_dynamicsWorld->getDispatcher()->getNumManifolds();
+  for (int i = 0; i < numManifolds; i++)
+    {
+      btPersistentManifold* contactManifold =  m_dynamicsWorld->getDispatcher()->getManifoldByIndexInternal(i);
+      const btCollisionObject* obA = contactManifold->getBody0();
+      const btCollisionObject* obB = contactManifold->getBody1();
+      int numContacts = contactManifold->getNumContacts();
+      for (int j = 0; j < numContacts; j++)
+        {
+          btManifoldPoint& pt = contactManifold->getContactPoint(j);
+          // printf("%f, %f, %f\n", pt[0], pt[1], pt[2]);
+          if (pt.getDistance() < 2.f)
+            {
+              printf("%d %d %d %f %f %f\n", numManifolds, i, j, gSphere->getCenterOfMassPosition()[0], gSphere->getCenterOfMassPosition()[1], gSphere->getCenterOfMassPosition()[2]);
+              return true;
+              const btVector3& ptA = pt.getPositionWorldOnA();
+              const btVector3& ptB = pt.getPositionWorldOnB();
+              const btVector3& normalOnB = pt.m_normalWorldOnB;
+            }
+        }
+    }
+  return false;
+}
 
 void BasicExample::stepSimulation(float deltaTime)
 {
@@ -56,10 +80,15 @@ void BasicExample::stepSimulation(float deltaTime)
   myfile.open (filename,std::ios::app);
   std::string s = std::to_string(gSphere->getCenterOfMassPosition()[0]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[1]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[2]) + ", " + std::to_string(gSphere->getLinearVelocity()[0]) + ", " + std::to_string(gSphere->getLinearVelocity()[1]) + ", " + std::to_string(gSphere->getLinearVelocity()[2]) + ", ";
   m_dynamicsWorld->stepSimulation(4./240,0);
-  s +=  std::to_string(gTilt) + ", "  + std::to_string(sphereMass) + ", " + std::to_string(gSphereFriction) + ", " + std::to_string(gRampRestitution) + "," + std::to_string(gSphere->getCenterOfMassPosition()[0]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[1]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[2]) + ", " + std::to_string(gSphere->getLinearVelocity()[0]) + ", " + std::to_string(gSphere->getLinearVelocity()[1]) + ", " + std::to_string(gSphere->getLinearVelocity()[2]) + "\n";
+  float tilt = 0.0f;
+  if (gSphere->getCenterOfMassPosition()[1] > 2.34f) {
+    tilt = gTilt;
+  }
+  bool coll = collision(m_dynamicsWorld, gSphere);
+  s +=  std::to_string(tilt) + ", "  + std::to_string(sphereMass) + ", " + std::to_string(gSphereFriction) + ", " + std::to_string(gRampRestitution) + ", " + std::to_string(coll)  + "," + std::to_string(gSphere->getCenterOfMassPosition()[0]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[1]) + ", " + std::to_string(gSphere->getCenterOfMassPosition()[2]) + ", " + std::to_string(gSphere->getLinearVelocity()[0]) + ", " + std::to_string(gSphere->getLinearVelocity()[1]) + ", " + std::to_string(gSphere->getLinearVelocity()[2]) + "\n";
   myfile << s;
   myfile.close();
-  //    b3Printf("Velocity = %f,%f,%f,%f,%f,%f\n",gSphere->getAngularVelocity()[0],
+    //    b3Printf("Velocity = %f,%f,%f,%f,%f,%f\n",gSphere->getAngularVelocity()[0],
     //                gSphere->getAngularVelocity()[1],
     //                gSphere->getAngularVelocity()[2],
     //                gSphere->getCenterOfMassPosition()[0],
@@ -101,9 +130,8 @@ void BasicExample::initPhysics()
 		btScalar mass(0.);
 		createRigidBody(mass,groundTransform,groundShape, btVector4(0,0,1,1));
 	}
-  /*
   { //create a static inclined plane
-		btBoxShape* inclinedPlaneShape = createBoxShape(btVector3(btScalar(20.),btScalar(1.),btScalar(10.)));
+		btBoxShape* inclinedPlaneShape = createBoxShape(btVector3(btScalar(30.),btScalar(1.),btScalar(10.)));
 		m_collisionShapes.push_back(inclinedPlaneShape);
 
 		btTransform startTransform;
@@ -125,9 +153,7 @@ void BasicExample::initPhysics()
 		ramp->setRestitution(gRampRestitution);
 	}
  
-  */
   { //create a static inclined plane
-    static btRigidBody* ramp2 = NULL;
 		btBoxShape* inclinedPlaneShape2 = createBoxShape(btVector3(btScalar(380.),btScalar(1.),btScalar(380.)));
 		m_collisionShapes.push_back(inclinedPlaneShape2);
 
@@ -151,7 +177,7 @@ void BasicExample::initPhysics()
 	}
   { //create a sphere above the inclined plane
     btSphereShape* sphereShape = new btSphereShape(btScalar(1));
-
+    sphereShape->setMargin(10);
 		m_collisionShapes.push_back(sphereShape);
 
 		btTransform startTransform;
@@ -159,14 +185,15 @@ void BasicExample::initPhysics()
 
 		btScalar sphereMass(.1f);
 
-		startTransform.setOrigin(btVector3(btScalar(18), btScalar(15), btScalar(14)));
+		startTransform.setOrigin(btVector3(btScalar(18), btScalar(30), btScalar(0)));
 
 		gSphere = createRigidBody(sphereMass, startTransform, sphereShape);
 		gSphere->forceActivationState(DISABLE_DEACTIVATION); // to prevent the sphere on the ramp from disabling
 		gSphere->setFriction(gSphereFriction);
 		gSphere->setRestitution(gSphereRestitution);
 		gSphere->setRollingFriction(gSphereRollingFriction);
-    gSphere->setLinearVelocity(btVector3(rnd(0), rnd(1), rnd(2)));
+    //gSphere->setLinearVelocity(btVector3(rnd(0), rnd(1), rnd(2)));
+    gSphere->setLinearVelocity(btVector3(0, 0, 0));
     printf ("Velocity = %f,%f,%f,%f,%f,%f\n",gSphere->getLinearVelocity()[0], gSphere->getLinearVelocity()[1], gSphere->getLinearVelocity()[2], gSphere->getCenterOfMassPosition()[0], gSphere->getCenterOfMassPosition()[1], gSphere->getCenterOfMassPosition()[2]);
 
     //gSphere->setContactStiffnessAndDamping(100,1);

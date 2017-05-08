@@ -57,7 +57,7 @@ weights = []
 for i in range(7):
     w = np.load('nn_weights/w_' + str(i) + '_49000.npy')
     weights.append(w)
-file = fileFromVars(0.0, 0.0, 0.0, 0.0, 8)
+file = fileFromVars(0.0, 0.0, 0.0, 0.0, 26)
 print (file)
 start = getPoint(file,2)
 print (start)
@@ -68,14 +68,14 @@ colors = cm.rainbow(np.linspace(0, 1, size))
 fig = plt.figure()
 ax = plt.axes()
 ax.scatter(data[:size,0],data[:size,1],c=colors)
-pylab.show()
+# pylab.show()
 
 
 
 test_data = np.array(start[3:])
 colors = cm.rainbow(np.linspace(0, 1, size))
-fig = plt.figure()
-ax = plt.axes()
+# fig = plt.figure()
+# ax = plt.axes()
 
 start_x = start[0]
 start_y = start[1]
@@ -90,6 +90,7 @@ y = []
 #y.append(start[1])
 for i in range(size):
     output = iterate_nn(test_data)
+    output += np.random.normal(0, 1, 3)
     test_data = update_traj(test_data,output)
     print (output)
     #print (test_data)
