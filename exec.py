@@ -15,16 +15,16 @@ gSphereFriction = 1
 gSphereRollingFriction = 0.368
 gSphereRestitution = 1.5
 
-for i in range(10):
+for i in range(0,1):
     for mass in range(0,1):
-        for rest in range(0,10):
-            for fric in range(0,10):
-                for tilt in range(0,10):
-                    gRampRestitution = rest/10.0
-                    gSphereRestitution = rest/10.0
-                    gRampFriction = fric/10.0
-                    gSphereFriction = fric/10.0
-                    gTilt = tilt/10.0*45.0
+        for rest in range(25,50):
+            for fric in range(0,50):
+                for tilt in range(0,50):
+                    gRampRestitution = rest/50.0
+                    gSphereRestitution = rest/50.0
+                    gRampFriction = fric/50.0
+                    gSphereFriction = fric/50.0
+                    gTilt = tilt/50.0*45.0
                     sphereMass = mass/10.0
                     filename = "experiments5/data_rest" + str(gRampRestitution) + "fric_" + str(gRampFriction) + "tilt" + str(gTilt)+ "mass"+str(sphereMass)+"exp"+str(i)+".txt"
 
@@ -41,7 +41,7 @@ for i in range(10):
                     import time
                     argument = '...'
                     proc = subprocess.Popen(['./basedemo.sh', '', argument], shell=True)
-                    time.sleep(20) # <-- There's no time.wait, but time.sleep.
+                    time.sleep(30) # <-- There's no time.wait, but time.sleep.
                     pid = proc.pid # <--- access `pid` attribute to get the pid of the child process.
                     proc.terminate()
 

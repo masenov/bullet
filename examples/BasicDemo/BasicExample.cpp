@@ -13,14 +13,14 @@
 //using namespace std;
 static btRigidBody* ramp = NULL;
 static btRigidBody* gSphere = NULL;
-static btScalar gTilt = 0.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
-static btScalar gRampFriction = 0.1; // set ramp friction to 1
+static btScalar gTilt = 9.0f/180.0f*SIMD_PI; // tilt the ramp 20 degrees
+static btScalar gRampFriction = 0.4; // set ramp friction to 1
 static btScalar gRampRestitution = 0.0; // set ramp restitution to 0 (no restitution)
-static btScalar gSphereFriction = 0.1; // set sphere friction to 1
+static btScalar gSphereFriction = 0.4; // set sphere friction to 1
 static btScalar gSphereRollingFriction =0.368; // set sphere rolling friction to 1
 static btScalar gSphereRestitution = 0.0; // set sphere restitution to 0
 static btScalar sphereMass = 0.0f;
-static std::string filename = "experiments5/data_rest0.0fric_0.1tilt0.0mass0.0exp0.txt";
+static std::string filename = "experiments5/data_rest0.0fric_0.4tilt9.0mass0.0exp6.txt";
 
 float rnd (int seed) {
   srand ( (unsigned) time(0) + seed );
