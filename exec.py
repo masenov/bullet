@@ -15,18 +15,18 @@ gSphereFriction = 1
 gSphereRollingFriction = 0.368
 gSphereRestitution = 1.5
 
-for i in range(100):
+for i in range(10):
     for mass in range(0,1):
         for rest in range(0,10):
             for fric in range(0,10):
-                for tilt in range(0,1):
+                for tilt in range(0,10):
                     gRampRestitution = rest/10.0
                     gSphereRestitution = rest/10.0
                     gRampFriction = fric/10.0
                     gSphereFriction = fric/10.0
                     gTilt = tilt/10.0*45.0
                     sphereMass = mass/10.0
-                    filename = "experiments3/data_rest" + str(gRampRestitution) + "fric_" + str(gRampFriction) + "tilt" + str(gTilt)+ "mass"+str(sphereMass)+"exp"+str(i)+".txt"
+                    filename = "experiments5/data_rest" + str(gRampRestitution) + "fric_" + str(gRampFriction) + "tilt" + str(gTilt)+ "mass"+str(sphereMass)+"exp"+str(i)+".txt"
 
                     variables = ['static btScalar gTilt = ' + str(gTilt) + 'f/180.0f*SIMD_PI; // tilt the ramp 20 degrees\n', 'static btScalar gRampFriction = ' + str(gRampFriction) + '; // set ramp friction to 1\n', 'static btScalar gRampRestitution = ' + str(gRampRestitution) + '; // set ramp restitution to 0 (no restitution)\n', 'static btScalar gSphereFriction = ' + str(gSphereFriction) + '; // set sphere friction to 1\n', 'static btScalar gSphereRollingFriction =' + str(gSphereRollingFriction) + '; // set sphere rolling friction to 1\n', 'static btScalar gSphereRestitution = ' + str(gSphereRestitution) + '; // set sphere restitution to 0\n', 'static btScalar sphereMass = ' + str(sphereMass) + 'f;\n', 'static std::string filename = "'+filename+'";\n']
 
