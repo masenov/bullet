@@ -41,7 +41,7 @@ for i in range(0,1):
                     import time
                     argument = '...'
                     proc = subprocess.Popen(['./basedemo.sh', '', argument], shell=True)
-                    time.sleep(30) # <-- There's no time.wait, but time.sleep.
+                    time.sleep(25) # <-- There's no time.wait, but time.sleep.
                     pid = proc.pid # <--- access `pid` attribute to get the pid of the child process.
                     proc.terminate()
 
